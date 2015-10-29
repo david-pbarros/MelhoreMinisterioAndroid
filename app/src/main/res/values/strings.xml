@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Melhore Seu Ministerio</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="tema1">Beneficie-se da</string>
+    <string name="tema2">Escola do Ministério</string>
+    <string name="tema3">Teocrático</string>
+
+    <string name="lbNome">Nome:</string>
+    <string name="lbSenha">Senha:</string>
+
+    <string name="btnOK">OK</string>
+
+    <!-- imgDescription -->
+    <string name="img_icone">icone</string>
+    <string name="img_line">linha</string>
+    <!-- imgDescription fim -->
+</resources>

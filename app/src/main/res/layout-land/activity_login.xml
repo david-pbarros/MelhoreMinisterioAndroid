@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:fitsSystemWindows="true"
+    tools:context="br.com.dbcorp.melhoreministerio.LoginActivity"
+    android:background="#320606">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/tema1"
+        android:id="@+id/tema1"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="54dp"
+        android:textSize="27sp"
+        android:textColor="@color/livro_name"
+        android:shadowColor="@color/black_overlay"
+        android:fontFamily="serif"
+        android:gravity="center_horizontal"
+        android:alpha="0.85" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/tema2"
+        android:id="@+id/tema2"
+        android:textSize="27sp"
+        android:textColor="@color/livro_name"
+        android:shadowColor="@color/black_overlay"
+        android:fontFamily="serif"
+        android:gravity="center_horizontal"
+        android:alpha="0.85"
+        android:layout_below="@+id/tema1"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/tema3"
+        android:id="@+id/tema3"
+        android:textSize="27sp"
+        android:textColor="@color/livro_name"
+        android:shadowColor="@color/black_overlay"
+        android:fontFamily="serif"
+        android:gravity="center_horizontal"
+        android:alpha="0.85"
+        android:layout_below="@+id/tema2"
+        android:layout_centerHorizontal="true" />
+
+    <TableLayout
+        style="@style/AppTheme.loginBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_below="@+id/tema3"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="39dp">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                style="@style/AppTheme.LoginBoxText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lbNome"
+                android:layout_column="1" />
+
+            <EditText
+                style="@style/AppTheme.LoginBoxText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txNome"
+                android:ems="10"
+                android:layout_column="4"
+                android:width="200dp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                style="@style/AppTheme.LoginBoxText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lbSenha"
+                android:id="@+id/textView"
+                android:layout_column="1" />
+
+            <EditText
+                style="@style/AppTheme.LoginBoxText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:id="@+id/txPass"
+                android:layout_column="4" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="2dp"
+                android:layout_column="0"
+                android:layout_span="7"
+                android:background="@drawable/dialog_line"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                style="@style/AppTheme.loginBoxButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btnOK"
+                android:id="@+id/btnOK"
+                android:onClick="login"
+                android:layout_column="1"
+                android:layout_span="6"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="2dp"
+                android:layout_column="0"
+                android:layout_span="7"
+                android:background="@drawable/dialog_line"/>
+        </TableRow>
+    </TableLayout>
+
+</RelativeLayout>

@@ -1,0 +1,23 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<item>
+    <shape xmlns:android="http://schemas.android.com/apk/res/android">
+	    <solid android:color="@color/dialog_boder"/>
+	    <corners android:topLeftRadius="5dp" android:topRightRadius="5dp" />
+	</shape>
+</item>
+<item
+    android:top="1dp"
+    android:right="1dp"
+    android:bottom="0dp"
+    android:left="1dp">
+    <shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:topLeftRadius="5dp" android:topRightRadius="5dp" />
+    <gradient 
+        android:startColor="@color/dialog_background_gradient"
+	    android:endColor="@color/dialog_background"
+	    android:gradientRadius="10"
+	    android:angle="270"
+	    android:type="linear"/>
+</shape>
+</item>
+</layer-list>
