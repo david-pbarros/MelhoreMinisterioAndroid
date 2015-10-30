@@ -8,6 +8,12 @@
 
     <string name="lbNome">Nome:</string>
     <string name="lbSenha">Senha:</string>
+    <string name="lbEstudante">Estudante:</string>
+    <string name="lbAjudante">Ajudante:</string>
+    <string name="lbTema">Tema:</string>
+    <string name="lbFonte">Fonte:</string>
+    <string name="lbAvaliacao">Avaliação:</string>
+    <string name="lb">:</string>7
 
     <string name="btnOK">OK</string>
 
@@ -15,4 +21,11 @@
     <string name="img_icone">icone</string>
     <string name="img_line">linha</string>
     <!-- imgDescription fim -->
+
+    <string-array name="tipo_avaliacao">
+        <item>Não Avaliado</item>
+        <item>Aprovado</item>
+        <item>Substituição</item>
+        <item>Reprovado</item>
+    </string-array>
 </resources>

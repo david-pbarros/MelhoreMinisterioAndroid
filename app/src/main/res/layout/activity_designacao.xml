@@ -11,6 +11,11 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="br.com.dbcorp.melhoreministerio.DesignacaoActivity">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/dialog_line"/>
+
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,7 +27,7 @@
         android:padding="5dp"
         android:background="@color/dialog_background">
 
-        <TableRow >
+        <TableRow>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -37,10 +42,220 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:text="00/00/0000"
                 android:id="@+id/lbTitle"
                 android:layout_gravity="center"
                 android:longClickable="true"/>
         </TableRow>
     </TableLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/dialog_line"/>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
+        <TableRow android:layout_marginBottom="6dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="2dp"
+                    android:text="@string/lbEstudante"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/lbEstudante" />
+        </TableRow>
+
+        <TableRow android:layout_marginBottom="6dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:text="@string/lbAjudante"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/lbAjudante" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:text="@string/lbTema"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/lbTema" />
+        </TableRow>
+
+        <TableRow android:layout_marginTop="-5dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
+                android:text="@string/lbFonte"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:id="@+id/lbFonte" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:text="@string/lbAvaliacao"/>
+
+            <Spinner
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:id="@+id/spAvaliacao"
+                android:spinnerMode="dropdown" />
+        </TableRow>
+    </TableLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/line"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tempo Definido:"
+            android:id="@+id/lbTempoDef"
+            android:layout_alignBaseline="@+id/imgMute"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:textSize="16sp"
+            android:layout_marginTop="18dp"
+            android:layout_marginRight="3dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00"
+            android:id="@+id/txTempoDef"
+            android:layout_alignTop="@+id/lbTempoDef"
+            android:layout_toRightOf="@+id/lbTempoDef"
+            android:layout_toEndOf="@+id/lbTempoDef"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imgMute"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="3dp"
+            android:src="@drawable/mute" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00"
+            android:id="@+id/txTempoDecorrido"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tempo Decorrido:"
+            android:id="@+id/lbTempoDecorrido"
+            android:layout_alignBottom="@+id/txTempoDecorrido"
+            android:layout_toLeftOf="@+id/txTempoDecorrido"
+            android:layout_toStartOf="@+id/txTempoDecorrido"
+            android:layout_marginRight="3dp"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Minutos"
+            android:id="@+id/lbMinutos"
+            android:textSize="18sp"
+            android:layout_above="@+id/imageView"
+            android:layout_alignLeft="@+id/txMinutos"
+            android:layout_alignStart="@+id/txMinutos" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Segundos"
+            android:id="@+id/lbSegundos"
+            android:layout_above="@+id/imageView"
+            android:layout_toLeftOf="@+id/txTempoDecorrido"
+            android:layout_toStartOf="@+id/txTempoDecorrido"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="00"
+            android:id="@+id/txMinutos"
+            android:textSize="40sp"
+            android:layout_alignBottom="@+id/imageView"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="48dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="00"
+            android:id="@+id/txSegundos"
+            android:textSize="40sp"
+            android:layout_alignTop="@+id/txMinutos"
+            android:layout_alignRight="@+id/lbSegundos"
+            android:layout_alignEnd="@+id/lbSegundos" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:src="@drawable/start"
+            android:layout_above="@+id/lbTempoDecorrido"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="52dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView2"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/restart"/>
+    </RelativeLayout>
+
+
 </LinearLayout>

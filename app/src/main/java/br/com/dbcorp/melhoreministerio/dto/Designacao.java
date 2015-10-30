@@ -78,10 +78,10 @@ public class Designacao implements Serializable {
         item.put("tipoDesignacao", tipoDesignacao);
         item.put("tempo", tempo);
         item.put("status", status);
-        item.put("estudante", estudante);
-        item.put("ajudante", ajudante);
-        item.put("tema", tema);
-        item.put("fonte", fonte);
+        item.put("estudante", "Estudante: " + estudante);
+        item.put("ajudante", "Ajudante: " + ajudante);
+        item.put("tema", "Tema: " + tema);
+        item.put("fonte", "Fonte: " + fonte);
 
         return item;
     }

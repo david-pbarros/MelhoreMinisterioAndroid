@@ -11,6 +11,8 @@
     <color name="button_back">#666666</color>
     <color name="button_back_login">#beb4b4b6</color>
 
+    <color name="black_line">#303030</color>
+
     <color name="accent">#6b80f2</color>
 
     <!-- Dialog colors -->
