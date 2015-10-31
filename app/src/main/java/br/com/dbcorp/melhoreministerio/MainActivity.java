@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             this.datas.add(sdf.parse("15/10/2015"));
             this.datas.add(sdf.parse("22/10/2015"));
             this.datas.add(sdf.parse("29/10/2015"));
+            this.datas.add(sdf.parse("05/11/2015"));
 
         } catch (Exception e) {
             //erro
@@ -163,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         datas.add("15/10/2015");
         datas.add("22/10/2015");
         datas.add("29/10/2015");
+        datas.add("05/11/2015");
 
         new DialogHelper(this)
                 .setTitle("Login", R.mipmap.ic_launcher, R.color.text_default)
