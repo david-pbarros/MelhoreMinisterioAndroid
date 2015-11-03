@@ -31,18 +31,18 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="25sp"
                 android:text="&lt;"
                 android:id="@+id/btBack"
                 android:layout_gravity="center"
                 android:clickable="true"
+                android:textAppearance="?attr/textAppearanceSemiLarge"
                 android:onClick="back"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
                 android:id="@+id/lbTitle"
+                android:textAppearance="?attr/textAppearanceSemiLarge"
                 android:layout_gravity="center"
                 android:longClickable="true"/>
         </TableRow>
@@ -133,8 +133,9 @@
         android:background="@drawable/line"/>
 
     <RelativeLayout
+        android:layout_weight="1"
+        android:layout_height="0dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp">
 
@@ -170,92 +171,110 @@
             android:layout_marginTop="3dp"
             android:src="@drawable/mute" />
 
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_weight="2"
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_gravity="center_horizontal">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_weight="1.2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Min."
+                android:layout_gravity="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="00"
+                android:layout_gravity="center" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_weight="1.6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:src="@drawable/start"
+            android:layout_gravity="center_vertical" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_weight="1.2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Seg."
+                android:layout_gravity="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="00"
+                android:layout_gravity="center" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_weight="1"
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imgReset"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="3dp"
+            android:src="@drawable/restart" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tempo Corrido:"
+            android:id="@+id/lbTempoCor"
+            android:layout_alignBaseline="@+id/txTempoCor"
+            android:layout_toLeftOf="@+id/txTempoCor"
+            android:layout_toStartOf="@+id/txTempoCor"
+            android:textSize="16sp"
+            android:layout_marginRight="3dp"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="00:00"
-            android:id="@+id/txTempoDecorrido"
+            android:id="@+id/txTempoCor"
             android:layout_alignParentBottom="true"
+            android:layout_alignBaseline="@+id/imgReset"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-
             android:textSize="18sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tempo Decorrido:"
-            android:id="@+id/lbTempoDecorrido"
-            android:layout_alignBottom="@+id/txTempoDecorrido"
-            android:layout_toLeftOf="@+id/txTempoDecorrido"
-            android:layout_toStartOf="@+id/txTempoDecorrido"
-            android:layout_marginRight="3dp"
-            android:textSize="16sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Minutos"
-            android:id="@+id/lbMinutos"
-            android:textSize="18sp"
-            android:layout_above="@+id/imageView"
-            android:layout_alignLeft="@+id/txMinutos"
-            android:layout_alignStart="@+id/txMinutos" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Segundos"
-            android:id="@+id/lbSegundos"
-            android:layout_above="@+id/imageView"
-            android:layout_toLeftOf="@+id/txTempoDecorrido"
-            android:layout_toStartOf="@+id/txTempoDecorrido"
-            android:textSize="18sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="00"
-            android:id="@+id/txMinutos"
-            android:textSize="40sp"
-            android:layout_alignBottom="@+id/imageView"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginBottom="48dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="00"
-            android:id="@+id/txSegundos"
-            android:textSize="40sp"
-            android:layout_alignTop="@+id/txMinutos"
-            android:layout_alignRight="@+id/lbSegundos"
-            android:layout_alignEnd="@+id/lbSegundos" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageView"
-            android:src="@drawable/start"
-            android:layout_above="@+id/lbTempoDecorrido"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="52dp" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageView2"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:src="@drawable/restart"/>
     </RelativeLayout>
-
-
 </LinearLayout>
