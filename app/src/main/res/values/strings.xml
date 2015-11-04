@@ -6,6 +6,9 @@
     <string name="tema2">Escola do Ministério</string>
     <string name="tema3">Teocrático</string>
 
+    <string name="minutos">Minutos</string>
+    <string name="segundos">Segundos</string>
+
     <string name="lbNome">Nome:</string>
     <string name="lbSenha">Senha:</string>
     <string name="lbEstudante">Estudante:</string>
@@ -13,7 +16,10 @@
     <string name="lbTema">Tema:</string>
     <string name="lbFonte">Fonte:</string>
     <string name="lbAvaliacao">Avaliação:</string>
-    <string name="lb">:</string>7
+    <string name="lbTempoDef">Tempo Definido:</string>
+    <string name="lbTempoCorrido">Tempo Corrido:</string>
+    <string name="lb">:</string>
+
 
     <string name="btnOK">OK</string>
 
@@ -28,4 +34,20 @@
         <item>Substituição</item>
         <item>Reprovado</item>
     </string-array>
+
+    <!--Preferences-->
+    <string name="title_activity_preferencias">Preferências</string>
+
+    <string name="divConf">Configuração</string>
+    <string name="divSobre">Sobre</string>
+
+    <string name="opTempo">Definir Tempo</string>
+    <string name="opAlarme">Definir Alarme</string>
+    <string name="opCong">Número da Congregação</string>
+
+    <string name="subOpLeitura">Leitura</string>
+    <string name="subOpVisita">Visita</string>
+    <string name="subOpRevisita">Revisita</string>
+    <string name="subOpEstudo">Estudo</string>
+    <!--Preferences fim-->
 </resources>

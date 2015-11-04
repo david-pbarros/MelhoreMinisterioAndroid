@@ -1,0 +1,43 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/divConf">
+
+        <PreferenceScreen android:title="@string/opTempo">
+            <br.com.dbcorp.melhoreministerio.preferencias.TimePreference
+                android:key="leitura_time"
+                android:title="@string/subOpLeitura"
+                android:defaultValue="3:3"/>
+
+            <br.com.dbcorp.melhoreministerio.preferencias.TimePreference
+                android:key="visita_time"
+                android:title="@string/subOpVisita"
+                android:defaultValue="4:3"/>
+
+            <br.com.dbcorp.melhoreministerio.preferencias.TimePreference
+                android:key="revisita_time"
+                android:title="@string/subOpRevisita"
+                android:defaultValue="5:3"/>
+
+            <br.com.dbcorp.melhoreministerio.preferencias.TimePreference
+                android:key="estudo_time"
+                android:title="@string/subOpEstudo"
+                android:defaultValue="6:3"/>
+        </PreferenceScreen>
+
+        <RingtonePreference android:title="@string/opAlarme"/>
+
+        <EditTextPreference android:key="nrCong"
+            android:title="@string/opCong"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/divSobre">
+        <Preference android:title="E-mail ao desenvolvedor">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="mailto:david_pbarros@hotmail.com.com">
+            </intent>
+        </Preference>
+        <Preference android:title="Versão do Programa" android:summary="1.00"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

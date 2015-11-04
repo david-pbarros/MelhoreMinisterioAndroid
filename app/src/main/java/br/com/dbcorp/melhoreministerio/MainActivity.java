@@ -13,11 +13,11 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import br.com.dbcorp.melhoreministerio.dto.Designacao;
+import br.com.dbcorp.melhoreministerio.preferencias.PreferenciasActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener, DialogInterface.OnClickListener, AdapterView.OnItemClickListener {
 
@@ -155,6 +155,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
     }
 
+    public void options(View view) {
+        startActivity(new Intent(this, PreferenciasActivity.class));
+    }
 
     @Override
     public boolean onLongClick(View v) {

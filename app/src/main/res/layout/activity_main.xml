@@ -41,7 +41,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="00/00/0000"
                 android:id="@+id/lbData"
                 android:layout_gravity="center"
                 android:textAppearance="?attr/textAppearanceSemiLarge"
@@ -65,7 +64,8 @@
                 android:id="@+id/btSinc"
                 android:textAppearance="?attr/textAppearanceSemiLarge"
                 android:layout_gravity="center_vertical"
-                android:clickable="true" />
+                android:clickable="true"
+                android:onClick="options"/>
         </TableRow>
     </TableLayout>
 

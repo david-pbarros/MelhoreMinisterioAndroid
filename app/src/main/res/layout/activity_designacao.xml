@@ -142,7 +142,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tempo Definido:"
+            android:text="@string/lbTempoDef"
             android:id="@+id/lbTempoDef"
             android:layout_alignBaseline="@+id/imgMute"
             android:layout_alignParentLeft="true"
@@ -191,7 +191,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Min."
+                android:text="@string/minutos"
                 android:layout_gravity="center" />
 
             <TextView
@@ -222,7 +222,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Seg."
+                android:text="@string/segundos"
                 android:layout_gravity="center" />
 
             <TextView
@@ -255,7 +255,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tempo Corrido:"
+            android:text="@string/lbTempoCorrido"
             android:id="@+id/lbTempoCor"
             android:layout_alignBaseline="@+id/txTempoCor"
             android:layout_toLeftOf="@+id/txTempoCor"
