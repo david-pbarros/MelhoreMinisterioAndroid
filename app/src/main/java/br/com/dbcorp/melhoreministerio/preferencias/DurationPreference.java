@@ -6,15 +6,13 @@ import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
 
-import br.com.dbcorp.melhoreministerio.preferencias.DBTimePicker;
-
 /**
  * Created by david.barros on 04/11/2015.
  */
-public class TimePreference extends DialogPreference {
+public class DurationPreference extends DialogPreference {
     private int minutes = 0;
     private int seconds = 0;
-    private DBTimePicker picker = null;
+    private DBDurationPicker picker = null;
     private final String DEFAULT_VALUE = "00:00";
 
     public static int getMinutes(String time) {
@@ -27,15 +25,15 @@ public class TimePreference extends DialogPreference {
         return Integer.parseInt(pieces[1]);
     }
 
-    public TimePreference(Context context) {
+    public DurationPreference(Context context) {
         super(context, null);
     }
 
-    public TimePreference(Context context, AttributeSet attrs) {
+    public DurationPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public TimePreference(Context context, AttributeSet attrs, int defStyle) {
+    public DurationPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         setPositiveButtonText("OK");
         setNegativeButtonText("Cancel");
@@ -61,7 +59,7 @@ public class TimePreference extends DialogPreference {
 
     @Override
     protected View onCreateDialogView() {
-        picker = new DBTimePicker(getContext());
+        picker = new DBDurationPicker(getContext());
         return picker;
     }
 

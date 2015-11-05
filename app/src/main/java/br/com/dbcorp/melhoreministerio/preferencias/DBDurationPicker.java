@@ -14,11 +14,11 @@ import java.util.List;
 /**
  * Created by david.barros on 04/11/2015.
  */
-public class DBTimePicker extends TimePicker {
+public class DBDurationPicker extends TimePicker {
 
     private static final int TIME_PICKER_INTERVAL = 1;
 
-    public DBTimePicker(Context context) {
+    public DBDurationPicker(Context context) {
         super(context);
         this.setIs24HourView(true);
     }

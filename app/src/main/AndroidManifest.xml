@@ -21,8 +21,6 @@
         </activity>
         <activity android:name=".preferencias.PreferenciasActivity" >
         </activity>
-        <activity android:name=".preferencias.EmailActivity" >
-        </activity>
     </application>
 
 </manifest>

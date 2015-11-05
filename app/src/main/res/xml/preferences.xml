@@ -1,43 +1,46 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/divConf">
+<PreferenceCategory android:title="@string/divConf">
 
-        <PreferenceScreen android:title="@string/opTempo">
-            <br.com.dbcorp.melhoreministerio.preferencias.TimePreference
-                android:key="leitura_time"
-                android:title="@string/subOpLeitura"
-                android:defaultValue="3:3"/>
+    <PreferenceScreen android:title="@string/opTempo">
+        <br.com.dbcorp.melhoreministerio.preferencias.DurationPreference
+            android:key="leitura_time"
+            android:title="@string/subOpLeitura"
+            android:defaultValue="3:3"/>
 
-            <br.com.dbcorp.melhoreministerio.preferencias.TimePreference
-                android:key="visita_time"
-                android:title="@string/subOpVisita"
-                android:defaultValue="4:3"/>
+        <br.com.dbcorp.melhoreministerio.preferencias.DurationPreference
+            android:key="visita_time"
+            android:title="@string/subOpVisita"
+            android:defaultValue="4:3"/>
 
-            <br.com.dbcorp.melhoreministerio.preferencias.TimePreference
-                android:key="revisita_time"
-                android:title="@string/subOpRevisita"
-                android:defaultValue="5:3"/>
+        <br.com.dbcorp.melhoreministerio.preferencias.DurationPreference
+            android:key="revisita_time"
+            android:title="@string/subOpRevisita"
+            android:defaultValue="5:3"/>
 
-            <br.com.dbcorp.melhoreministerio.preferencias.TimePreference
-                android:key="estudo_time"
-                android:title="@string/subOpEstudo"
-                android:defaultValue="6:3"/>
-        </PreferenceScreen>
+        <br.com.dbcorp.melhoreministerio.preferencias.DurationPreference
+            android:key="estudo_time"
+            android:title="@string/subOpEstudo"
+            android:defaultValue="6:3"/>
+    </PreferenceScreen>
 
-        <RingtonePreference android:title="@string/opAlarme"/>
+    <PreferenceScreen android:title="@string/opAlarme" android:key="cat_som" android:summary="teste">
+        <CheckBoxPreference android:title="@string/subOpPerSom" android:key="som_pers" android:defaultValue="false"/>
+        <RingtonePreference android:title="@string/subOpSom" android:ringtoneType="all" android:showSilent="false" android:showDefault="true" android:key="alarm" android:dependency="som_pers"/>
+    </PreferenceScreen>
 
-        <EditTextPreference android:key="nrCong"
-            android:title="@string/opCong"/>
+    <EditTextPreference android:key="nrCong"
+        android:title="@string/opCong"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/divSobre">
-        <Preference android:title="E-mail ao desenvolvedor">
+        <Preference android:title="@string/opEmail">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="mailto:david_pbarros@hotmail.com.com">
             </intent>
         </Preference>
-        <Preference android:title="Versão do Programa" android:summary="1.00"/>
+        <Preference android:title="@string/opVersao" android:summary="@string/sumaryVersao"/>
     </PreferenceCategory>
 
 </PreferenceScreen>
