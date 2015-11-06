@@ -1,12 +1,15 @@
 package br.com.dbcorp.melhoreministerio;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -16,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -64,6 +68,8 @@ public class DesignacaoActivity extends AppCompatActivity {
 
         this.setCamposTela();
         this.setPlayer();
+
+        this.player.start();
     }
 
     public void back(View view) {
@@ -100,22 +106,24 @@ public class DesignacaoActivity extends AppCompatActivity {
             Uri uri = Uri.parse(path);
 
             try {
-                String type = MimeTypeMap.getSingleton().getExtensionFromMimeType(this.getContentResolver().getType(uri));
+                this.player = new MediaPlayer();
+
+                ContentResolver contentResolver = this.getContentResolver();
+                String type = MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri));
 
                 if ("MP3".equalsIgnoreCase(type)) {
-                    path = path.replace("content:", "file:/");
-
-                    this.player = new MediaPlayer();
-                    this.player.setDataSource(path);
+                    //get resource uri from content uri
+                    Uri contentUri = ContentUris.withAppendedId(android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, ContentUris.parseId(uri));
+                    this.player.setDataSource(getApplicationContext(), contentUri);
 
                 } else {
-                    this.player = new MediaPlayer();
                     this.player.setDataSource(this, uri);
                 }
 
-                Toast.makeText(this, path, Toast.LENGTH_LONG).show();
+                this.player.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 this.player.prepare();
-            } catch (IOException e) {
+
+            } catch (Exception e) {
                 Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
                 this.player = MediaPlayer.create(this, R.raw.bell);
             }

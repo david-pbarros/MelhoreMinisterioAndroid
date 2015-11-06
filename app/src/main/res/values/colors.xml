@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black_overlay">#66000000</color>
-    <color name="livro_name">#af9a28</color>
-    <color name="back">#BF000000</color>
-    <color name="black">#000000</color>
-    <color name="text_default">#FFFFFF</color>
-    <color name="back_boder">#FFFFFF</color>
-    <color name="hint">#CCCCCC</color>
-    <color name="list_back">#E6333333</color>
-    <color name="button_back">#666666</color>
-    <color name="button_back_login">#beb4b4b6</color>
+  <color name="black_overlay">#66000000</color>
+  <color name="livro_name">#af9a28</color>
+  <color name="back">#BF000000</color>
+  <color name="black">#000000</color>
+  <color name="text_default">#FFFFFF</color>
+  <color name="back_boder">#FFFFFF</color>
+  <color name="hint">#CCCCCC</color>
+  <color name="list_back">#E6333333</color>
+  <color name="button_back">#666666</color>
+  <color name="button_back_login">#beb4b4b6</color>
 
-    <color name="black_line">#303030</color>
+  <color name="black_line">#303030</color>
 
-    <color name="accent">#6b80f2</color>
+  <color name="accent">#6b80f2</color>
 
-    <!-- Dialog colors -->
-    <color name="dialog_background">#99999C</color>
-    <color name="dialog_background_gradient">#CCCCCC</color>
-    <color name="dialog_boder">#FFFFFF</color>
-    <color name="dialog_line">#FFFFFF</color>
-    <color name="dialog_list_selected">#CCCCCC</color><!-- #B300FFFF -->
-    <color name="dialog_text">#000000</color>
-    <!-- Dialog Colors / -->
+  <!-- Dialog colors -->
+  <color name="dialog_background">#99999C</color>
+  <color name="dialog_background_gradient">#CCCCCC</color>
+  <color name="dialog_boder">#FFFFFF</color>
+  <color name="dialog_line">#FFFFFF</color>
+  <color name="dialog_list_selected">#CCCCCC</color><!-- #B300FFFF -->
+  <color name="dialog_text">#000000</color>
+  <!-- Dialog Colors / -->
 </resources>

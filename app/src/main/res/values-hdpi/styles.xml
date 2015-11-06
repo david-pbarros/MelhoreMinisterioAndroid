@@ -1,0 +1,31 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+  <style name="AppTheme.TextAppearance">
+    <item name="android:textColor">@color/text_default</item>
+    <item name="android:textSize">12sp</item>
+  </style>
+
+  <style name="AppTheme.TextAppearanceLarge">
+    <item name="android:textColor">@color/text_default</item>
+    <item name="android:textSize">26sp</item>
+  </style>
+
+  <style name="AppTheme.TextAppearanceSemiLarge">
+    <item name="android:textColor">@color/text_default</item>
+    <item name="android:textSize">23sp</item>
+  </style>
+
+  <style name="AppTheme.TextBlack">
+    <item name="android:textColor">@android:color/black</item>
+    <item name="android:textSize">12sp</item>
+  </style>
+
+  <style name="AppTheme.TextAppearance.label">
+    <item name="android:textSize">11sp</item>
+    <item name="android:textStyle">bold</item>
+  </style>
+
+  <style name="spinner_style" parent="android:TextAppearance.Widget.TextView.SpinnerItem">
+    <item name="android:textAppearance">@style/AppTheme.TextAppearance</item>
+    <item name="android:textSize">15sp</item>
+  </style>
+</resources>

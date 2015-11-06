@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:text="@string/tema2"
         android:id="@+id/tema2"
-        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textAppearance="@style/AppTheme.TextAppearanceLarge"
         android:textColor="@color/livro_name"
         android:shadowColor="@color/black_overlay"
         android:fontFamily="serif"
