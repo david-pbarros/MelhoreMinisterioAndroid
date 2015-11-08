@@ -85,19 +85,6 @@
                 android:id="@+id/lbAjudante" />
         </TableRow>
 
-        <TableRow>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="2dp"
-                android:text="@string/lbTema"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/lbTema" />
-        </TableRow>
-
         <TableRow android:layout_marginTop="-5dp">
             <TextView
                 android:layout_width="wrap_content"
@@ -111,6 +98,10 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/lbFonte" />
 
+
+        </TableRow>
+
+        <TableRow>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

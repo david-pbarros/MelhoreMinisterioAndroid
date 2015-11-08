@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import br.com.dbcorp.melhoreministerio.dto.Designacao;
+import br.com.dbcorp.melhoreministerio.dto.TipoDesignacao;
 
 public class DesignacaoActivity extends AppCompatActivity {
 
@@ -32,11 +33,13 @@ public class DesignacaoActivity extends AppCompatActivity {
 
     private TextView lbEstudante;
     private TextView lbAjudante;
-    private TextView lbTema;
     private TextView lbFonte;
+    private TextView txTempoDef;
     private Spinner spAvaliacao;
     private MediaPlayer player;
     private SharedPreferences preferences;
+
+    private int segundos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +48,11 @@ public class DesignacaoActivity extends AppCompatActivity {
 
         //TODO: remover instancia
         this.designacao= new Designacao();
-        this.designacao.setTipoDesignacao("Leitura");
+        this.designacao.setTipoDesignacao(TipoDesignacao.LEITURA);
         this.designacao.setTempo("00:00");
         this.designacao.setStatus("V");
         this.designacao.setEstudante("Fulano Da Silva");
         this.designacao.setAjudante("Sicrano Junior");
-        this.designacao.setTema("Como fazer a lista android");
         this.designacao.setFonte("IgT p.99");
         this.designacao.setData(new Date());
 
@@ -60,14 +62,15 @@ public class DesignacaoActivity extends AppCompatActivity {
 
         this.lbEstudante = (TextView) findViewById(R.id.lbEstudante);
         this.lbAjudante = (TextView) findViewById(R.id.lbAjudante);
-        this.lbTema = (TextView) findViewById(R.id.lbTema);
         this.lbFonte = (TextView) findViewById(R.id.lbFonte);
+        this.txTempoDef = (TextView) findViewById(R.id.txTempoDef);
         this.spAvaliacao = (Spinner) findViewById(R.id.spAvaliacao);
 
         this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         this.setCamposTela();
         this.setPlayer();
+        this.setTempoMaximo();
 
         this.player.start();
     }
@@ -90,7 +93,6 @@ public class DesignacaoActivity extends AppCompatActivity {
     private void setCamposTela() {
         this.lbEstudante.setText(this.designacao.getEstudante());
         this.lbAjudante.setText(this.designacao.getAjudante());
-        this.lbTema.setText(this.designacao.getTema());
         this.lbFonte.setText(this.designacao.getFonte());
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.tipo_avaliacao, android.R.layout.simple_spinner_dropdown_item);
@@ -130,5 +132,54 @@ public class DesignacaoActivity extends AppCompatActivity {
         }
 
         this.player.setLooping(true);
+    }
+
+    private void setTempoMaximo() {
+        switch (this.designacao.getTipoDesignacao()) {
+            case LEITURA:
+                this.preparaTempoDesignado(this.preferences.getString("leitura_time", "0:0"));
+                break;
+            case VISITA:
+                this.preparaTempoDesignado(this.preferences.getString("visita_time", "0:0"));
+                break;
+            case REVISITA:
+                this.preparaTempoDesignado(this.preferences.getString("revisita_time", "0:0"));
+                break;
+            case ESTUDO:
+                this.preparaTempoDesignado(this.preferences.getString("estudo_time", "0:0"));
+                break;
+        }
+    }
+
+    private void preparaTempoDesignado(String tempo) {
+        String[] temp = tempo.split(":");
+
+        this.txTempoDef.setText(this.leftZeros(temp[0]) + ":" + this.leftZeros(temp[1]));
+
+        this.setSegundos(temp[0], temp[1]);
+    }
+
+    private String leftZeros(String value) {
+        while (value.length() < 2) {
+            value = "0" + value;
+        }
+
+        return value;
+    }
+
+    private void setSegundos(String minutos, String segundos) {
+        if (segundos == null || "".equals(segundos)) {
+            segundos = "0";
+        }
+
+        this.segundos = Integer.parseInt(segundos);
+
+        if (minutos == null || "".equals(minutos)) {
+            minutos = "0";
+        }
+
+        int minutosInt = Integer.parseInt(minutos);
+
+        this.segundos += (minutosInt * 60);
     }
 }

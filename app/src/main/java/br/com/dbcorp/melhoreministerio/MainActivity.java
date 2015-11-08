@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import br.com.dbcorp.melhoreministerio.dto.Designacao;
+import br.com.dbcorp.melhoreministerio.dto.TipoDesignacao;
 import br.com.dbcorp.melhoreministerio.preferencias.PreferenciasActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener, DialogInterface.OnClickListener, AdapterView.OnItemClickListener {
@@ -26,8 +27,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private int index;
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-    private static final String de[] = {"tipoDesignacao", "tempo", "status", "estudante", "ajudante", "tema", "fonte"};
-    private static final int para[] = {R.id.tipoDesignacao, R.id.tempo, R.id.status, R.id.estudante, R.id.ajudante, R.id.tema, R.id.fonte};
+    private static final String de[] = {"tipoDesignacao", "tempo", "status", "estudante", "ajudante", "fonte"};
+    private static final int para[] = {R.id.tipoDesignacao, R.id.tempo, R.id.status, R.id.estudante, R.id.ajudante, R.id.fonte};
 
     private ListView listaDesignacoes;
     private TextView txData;
@@ -53,12 +54,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
         //TODO:substiruir linhas abaixo por vindas do banco
         try {
-            this.datas.add(sdf.parse("01/10/2015"));
-            this.datas.add(sdf.parse("08/10/2015"));
-            this.datas.add(sdf.parse("15/10/2015"));
-            this.datas.add(sdf.parse("22/10/2015"));
-            this.datas.add(sdf.parse("29/10/2015"));
             this.datas.add(sdf.parse("05/11/2015"));
+            this.datas.add(sdf.parse("12/11/2015"));
+            this.datas.add(sdf.parse("19/11/2015"));
+            this.datas.add(sdf.parse("26/11/2015"));
 
         } catch (Exception e) {
             //erro
@@ -90,45 +89,41 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
         //TODO:substiruir linhas abaixo por vindas do banco
         Designacao d = new Designacao();
-        d.setTipoDesignacao("Leitura");
+        d.setTipoDesignacao(TipoDesignacao.LEITURA);
         d.setTempo("00:00");
         d.setStatus("V");
         d.setEstudante("Fulano Da Silva" + this.index);
         d.setAjudante("Sicrano Junior");
-        d.setTema("Como fazer a lista android");
         d.setFonte("IgT p.99");
         d.setData(this.datas.get(this.index));
         designacoes.add(d);
 
         d = new Designacao();
-        d.setTipoDesignacao("Visita");
+        d.setTipoDesignacao(TipoDesignacao.VISITA);
         d.setTempo("00:00");
         d.setStatus("V");
         d.setEstudante("Fulano Da Silva" + this.index);
         d.setAjudante("Sicrano Junior");
-        d.setTema("Como fazer a lista android");
         d.setFonte("IgT p.99");
         d.setData(this.datas.get(this.index));
         designacoes.add(d);
 
         d = new Designacao();
-        d.setTipoDesignacao("Revisita");
+        d.setTipoDesignacao(TipoDesignacao.REVISITA);
         d.setTempo("00:00");
         d.setStatus("V");
         d.setEstudante("Fulano Da Silva" + this.index);
         d.setAjudante("Sicrano Junior");
-        d.setTema("Como fazer a lista android");
         d.setFonte("IgT p.99");
         d.setData(this.datas.get(this.index));
         designacoes.add(d);
 
         d = new Designacao();
-        d.setTipoDesignacao("Estudo");
+        d.setTipoDesignacao(TipoDesignacao.ESTUDO);
         d.setTempo("00:00");
         d.setStatus("V");
         d.setEstudante("Fulano Da Silva" + this.index);
         d.setAjudante("Sicrano Junior");
-        d.setTema("Como fazer a lista android");
         d.setFonte("IgT p.99");
         d.setData(this.datas.get(this.index));
         designacoes.add(d);
@@ -162,12 +157,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     @Override
     public boolean onLongClick(View v) {
         List<String> datas = new ArrayList<>();
-        datas.add("01/10/2015");
-        datas.add("08/10/2015");
-        datas.add("15/10/2015");
-        datas.add("22/10/2015");
-        datas.add("29/10/2015");
         datas.add("05/11/2015");
+        datas.add("12/11/2015");
+        datas.add("19/11/2015");
+        datas.add("26/11/2015");
 
         new DialogHelper(this)
                 .setTitle("Login", R.mipmap.ic_launcher, R.color.text_default)

@@ -7,19 +7,18 @@ import java.util.Map;
 
 public class Designacao implements Serializable {
 
-    private String tipoDesignacao;
+    private TipoDesignacao tipoDesignacao;
     private String tempo;
     private String status;
     private String estudante;
     private String ajudante;
-    private String tema;
     private String fonte;
     private Date data;
 
-    public String getTipoDesignacao() {
+    public TipoDesignacao getTipoDesignacao() {
         return tipoDesignacao;
     }
-    public void setTipoDesignacao(String tipoDesignacao) {
+    public void setTipoDesignacao(TipoDesignacao tipoDesignacao) {
         this.tipoDesignacao = tipoDesignacao;
     }
 
@@ -51,13 +50,6 @@ public class Designacao implements Serializable {
         this.ajudante = ajudante;
     }
 
-    public String getTema() {
-        return tema;
-    }
-    public void setTema(String tema) {
-        this.tema = tema;
-    }
-
     public String getFonte() {
         return fonte;
     }
@@ -75,12 +67,11 @@ public class Designacao implements Serializable {
 
     public Map<String, Object> toMap() {
         Map<String, Object> item = new HashMap<>();
-        item.put("tipoDesignacao", tipoDesignacao);
+        item.put("tipoDesignacao", tipoDesignacao.getLabel());
         item.put("tempo", tempo);
         item.put("status", status);
         item.put("estudante", "Estudante: " + estudante);
         item.put("ajudante", "Ajudante: " + ajudante);
-        item.put("tema", "Tema: " + tema);
         item.put("fonte", "Fonte: " + fonte);
 
         return item;
