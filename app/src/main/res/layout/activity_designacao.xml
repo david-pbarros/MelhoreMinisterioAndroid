@@ -145,7 +145,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="00:00"
             android:id="@+id/txTempoDef"
             android:layout_alignTop="@+id/lbTempoDef"
             android:layout_toRightOf="@+id/lbTempoDef"
@@ -189,7 +188,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="00"
+                android:id="@+id/minCrono"
                 android:layout_gravity="center" />
 
         </LinearLayout>
@@ -198,9 +197,11 @@
             android:layout_weight="1.6"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/imageView"
+            android:id="@+id/btStart"
             android:src="@drawable/start"
-            android:layout_gravity="center_vertical" />
+            android:layout_gravity="center_vertical"
+            android:clickable="true"
+            android:onClick="cronometro"/>
 
         <LinearLayout
             android:orientation="vertical"
@@ -220,7 +221,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="00"
+                android:id="@+id/secCrono"
                 android:layout_gravity="center" />
 
         </LinearLayout>

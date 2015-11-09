@@ -2,14 +2,11 @@ package br.com.dbcorp.melhoreministerio;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -19,8 +16,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -35,11 +30,15 @@ public class DesignacaoActivity extends AppCompatActivity {
     private TextView lbAjudante;
     private TextView lbFonte;
     private TextView txTempoDef;
+    private TextView txMinCrono;
+    private TextView txSecCrono;
     private Spinner spAvaliacao;
     private MediaPlayer player;
     private SharedPreferences preferences;
 
+    private int minutos;
     private int segundos;
+    private Thread cronometro;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +63,8 @@ public class DesignacaoActivity extends AppCompatActivity {
         this.lbAjudante = (TextView) findViewById(R.id.lbAjudante);
         this.lbFonte = (TextView) findViewById(R.id.lbFonte);
         this.txTempoDef = (TextView) findViewById(R.id.txTempoDef);
+        this.txMinCrono = (TextView) findViewById(R.id.minCrono);
+        this.txSecCrono = (TextView) findViewById(R.id.secCrono);
         this.spAvaliacao = (Spinner) findViewById(R.id.spAvaliacao);
 
         this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -73,6 +74,33 @@ public class DesignacaoActivity extends AppCompatActivity {
         this.setTempoMaximo();
 
         this.player.start();
+
+        this.cronometro = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int tempo = segundos + (minutos * 60); tempo > 0; tempo--) {
+                    if (segundos == 0) {
+                        segundos = 59;
+                        minutos--;
+                    } else {
+                        segundos--;
+                    }
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setTempoCronometro(minutos, segundos);
+                        }
+                    });
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     public void back(View view) {
@@ -88,6 +116,15 @@ public class DesignacaoActivity extends AppCompatActivity {
         }
 
         this.player.release();
+    }
+
+    public void cronometro(View view) {
+        if (this.cronometro.getState() == Thread.State.NEW || this.cronometro.getState() == Thread.State.TERMINATED) {
+            this.cronometro.start();
+
+        } else {
+            this.cronometro.start();
+        }
     }
 
     private void setCamposTela() {
@@ -154,9 +191,23 @@ public class DesignacaoActivity extends AppCompatActivity {
     private void preparaTempoDesignado(String tempo) {
         String[] temp = tempo.split(":");
 
-        this.txTempoDef.setText(this.leftZeros(temp[0]) + ":" + this.leftZeros(temp[1]));
+        String segundos = this.leftZeros(temp[1]);
+        String minutos = this.leftZeros(temp[0]);
 
-        this.setSegundos(temp[0], temp[1]);
+        this.txTempoDef.setText(minutos + ":" + segundos);
+
+        this.setTempo(temp[0], temp[1]);
+        this.setTempoCronometro(minutos, segundos);
+    }
+
+    private void setTempoCronometro(String minutos, String segundos) {
+        this.txMinCrono.setText(minutos);
+        this.txSecCrono.setText(segundos);
+    }
+
+    private void setTempoCronometro(int minutos, int segundos) {
+        this.txMinCrono.setText(leftZeros(Integer.toString(minutos)));
+        this.txSecCrono.setText(leftZeros(Integer.toString(segundos)));
     }
 
     private String leftZeros(String value) {
@@ -167,7 +218,7 @@ public class DesignacaoActivity extends AppCompatActivity {
         return value;
     }
 
-    private void setSegundos(String minutos, String segundos) {
+    private void setTempo(String minutos, String segundos) {
         if (segundos == null || "".equals(segundos)) {
             segundos = "0";
         }
@@ -178,8 +229,6 @@ public class DesignacaoActivity extends AppCompatActivity {
             minutos = "0";
         }
 
-        int minutosInt = Integer.parseInt(minutos);
-
-        this.segundos += (minutosInt * 60);
+        this.minutos = Integer.parseInt(minutos);
     }
 }
