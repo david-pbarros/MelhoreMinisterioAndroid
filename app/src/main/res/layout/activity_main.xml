@@ -28,15 +28,15 @@
         android:background="@color/dialog_background">
 
         <TableRow >
-            <TextView
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:text="&lt;"
-            android:id="@+id/btPrevious"
-            android:layout_gravity="center"
-            android:clickable="true"
-            android:textAppearance="?attr/textAppearanceSemiLarge"
-            android:onClick="previous"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btPrevious"
+                android:layout_gravity="center"
+                android:src="@drawable/previous"
+                android:clickable="true"
+                android:onClick="previous"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -46,24 +46,21 @@
                 android:textAppearance="?attr/textAppearanceSemiLarge"
                 android:longClickable="true"/>
 
-            <TextView
-                android:layout_width="40dp"
+            <ImageView
                 android:layout_height="wrap_content"
                 android:text=">"
                 android:id="@+id/btNext"
                 android:layout_gravity="center"
+                android:src="@drawable/next"
                 android:clickable="true"
-                android:textAppearance="?attr/textAppearanceSemiLarge"
-                android:onClick="next"/>
+                android:onClick="next" />
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="O"
-                android:id="@+id/btSinc"
-                android:textAppearance="?attr/textAppearanceSemiLarge"
+                android:id="@+id/btOpt"
                 android:layout_gravity="center_vertical"
+                android:src="@drawable/option"
                 android:clickable="true"
                 android:onClick="options"/>
         </TableRow>

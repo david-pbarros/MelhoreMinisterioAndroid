@@ -2,6 +2,7 @@ package br.com.dbcorp.melhoreministerio;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -12,13 +13,16 @@ import android.os.Bundle;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
+import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
+import br.com.dbcorp.melhoreministerio.dto.Avaliacao;
 import br.com.dbcorp.melhoreministerio.dto.Designacao;
 import br.com.dbcorp.melhoreministerio.dto.TipoDesignacao;
 
@@ -32,30 +36,24 @@ public class DesignacaoActivity extends AppCompatActivity {
     private TextView txTempoDef;
     private TextView txMinCrono;
     private TextView txSecCrono;
+    private TextView txTempoCor;
     private Spinner spAvaliacao;
     private MediaPlayer player;
     private SharedPreferences preferences;
 
     private int minutos;
     private int segundos;
-    private Thread cronometro;
+    private int curMinutos;
+    private int curSegundos;
+    private boolean started;
+    private boolean mudo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_designacao);
 
-        //TODO: remover instancia
-        this.designacao= new Designacao();
-        this.designacao.setTipoDesignacao(TipoDesignacao.LEITURA);
-        this.designacao.setTempo("00:00");
-        this.designacao.setStatus("V");
-        this.designacao.setEstudante("Fulano Da Silva");
-        this.designacao.setAjudante("Sicrano Junior");
-        this.designacao.setFonte("IgT p.99");
-        this.designacao.setData(new Date());
-
-        //TODO:ajustar this.designacao = (Designacao) this.getIntent().getExtras().getSerializable("designacao");
+        this.designacao = (Designacao) this.getIntent().getExtras().getSerializable("designacao");
 
         ((TextView)findViewById(R.id.lbTitle)).setText(new SimpleDateFormat("dd/MM/yyyy").format(this.designacao.getData()) + " - " + designacao.getTipoDesignacao());
 
@@ -65,6 +63,7 @@ public class DesignacaoActivity extends AppCompatActivity {
         this.txTempoDef = (TextView) findViewById(R.id.txTempoDef);
         this.txMinCrono = (TextView) findViewById(R.id.minCrono);
         this.txSecCrono = (TextView) findViewById(R.id.secCrono);
+        this.txTempoCor = (TextView) findViewById(R.id.txTempoCor);
         this.spAvaliacao = (Spinner) findViewById(R.id.spAvaliacao);
 
         this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -72,35 +71,7 @@ public class DesignacaoActivity extends AppCompatActivity {
         this.setCamposTela();
         this.setPlayer();
         this.setTempoMaximo();
-
-        this.player.start();
-
-        this.cronometro = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int tempo = segundos + (minutos * 60); tempo > 0; tempo--) {
-                    if (segundos == 0) {
-                        segundos = 59;
-                        minutos--;
-                    } else {
-                        segundos--;
-                    }
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            setTempoCronometro(minutos, segundos);
-                        }
-                    });
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
+        this.txTempoCor.setText(this.designacao.getTempo());
     }
 
     public void back(View view) {
@@ -109,22 +80,58 @@ public class DesignacaoActivity extends AppCompatActivity {
 
     @Override
     public void finish() {
-        super.finish();
-
         if (player.isPlaying()) {
             this.player.stop();
         }
 
         this.player.release();
+
+        this.designacao.setTempo((String) this.txTempoCor.getText());
+        this.designacao.setStatus(Avaliacao.values()[this.spAvaliacao.getSelectedItemPosition()].getSigla());
+
+        Intent data = new Intent();
+        data.putExtra("designacao", this.designacao);
+        setResult(RESULT_OK, data);
+
+        super.finish();
     }
 
     public void cronometro(View view) {
-        if (this.cronometro.getState() == Thread.State.NEW || this.cronometro.getState() == Thread.State.TERMINATED) {
-            this.cronometro.start();
+        if (this.started) {
+            this.stopCron();
 
         } else {
-            this.cronometro.start();
+            this.started = true;
+            this.setCronometro().start();
+            //TODO: modificar icone start
         }
+    }
+
+    public void reset(View view) {
+        if (this.started) {
+           this.stopCron();
+        }
+
+        this.curSegundos = 0;
+        this.curMinutos = 0;
+
+        this.setTempoCorrido(this.curMinutos, this.curSegundos);
+        this.setTempoMaximo();
+    }
+
+    public void mute(View view) {
+        this.mudo = !this.mudo;
+        //TODO: modificar icone mudo
+    }
+
+    private void stopCron() {
+        this.started = false;
+
+        if (this.player.isPlaying()) {
+            this.player.stop();
+        }
+
+        //TODO: modificar icone start
     }
 
     private void setCamposTela() {
@@ -132,8 +139,16 @@ public class DesignacaoActivity extends AppCompatActivity {
         this.lbAjudante.setText(this.designacao.getAjudante());
         this.lbFonte.setText(this.designacao.getFonte());
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.tipo_avaliacao, android.R.layout.simple_spinner_dropdown_item);
+        String[] status = new String[Avaliacao.values().length];
+
+        for (int i = 0; i < Avaliacao.values().length; i++) {
+            status[i] = Avaliacao.values()[i].getLabel();
+        }
+
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_dropdown_item, status);
         this.spAvaliacao.setAdapter(adapter);
+
+        this.spAvaliacao.setSelection(Avaliacao.getByInitials(this.designacao.getStatus()).ordinal());
     }
 
     private void setPlayer() {
@@ -174,16 +189,16 @@ public class DesignacaoActivity extends AppCompatActivity {
     private void setTempoMaximo() {
         switch (this.designacao.getTipoDesignacao()) {
             case LEITURA:
-                this.preparaTempoDesignado(this.preferences.getString("leitura_time", "0:0"));
+                this.preparaTempoDesignado(this.preferences.getString("leitura_time", getResources().getString(R.string.tempo_df_leitura)));
                 break;
             case VISITA:
-                this.preparaTempoDesignado(this.preferences.getString("visita_time", "0:0"));
+                this.preparaTempoDesignado(this.preferences.getString("visita_time", getResources().getString(R.string.tempo_df_visita)));
                 break;
             case REVISITA:
-                this.preparaTempoDesignado(this.preferences.getString("revisita_time", "0:0"));
+                this.preparaTempoDesignado(this.preferences.getString("revisita_time", getResources().getString(R.string.tempo_df_revisita)));
                 break;
             case ESTUDO:
-                this.preparaTempoDesignado(this.preferences.getString("estudo_time", "0:0"));
+                this.preparaTempoDesignado(this.preferences.getString("estudo_time", getResources().getString(R.string.tempo_df_estudo)));
                 break;
         }
     }
@@ -210,6 +225,10 @@ public class DesignacaoActivity extends AppCompatActivity {
         this.txSecCrono.setText(leftZeros(Integer.toString(segundos)));
     }
 
+    private void setTempoCorrido(int minutos, int segundos) {
+        this.txTempoCor.setText(leftZeros(Integer.toString(minutos)) + ":" + leftZeros(Integer.toString(segundos)));
+    }
+
     private String leftZeros(String value) {
         while (value.length() < 2) {
             value = "0" + value;
@@ -230,5 +249,68 @@ public class DesignacaoActivity extends AppCompatActivity {
         }
 
         this.minutos = Integer.parseInt(minutos);
+    }
+
+    private Thread setCronometro() {
+        Thread cronometro = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int tempo = segundos + (minutos * 60);; tempo--) {
+                    this.contagemRegressiva();
+                    this.contagemProgressiva();
+
+                    try {
+                        Thread.sleep(1000);
+
+                        if (!started) {
+                            Thread.currentThread().interrupt();
+                            break;
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            private void contagemRegressiva() {
+                if (segundos == 0) {
+                    segundos = 59;
+                    minutos--;
+
+                } else {
+                    segundos--;
+                }
+
+                if (minutos == 0 && segundos == 0 && !mudo) {
+                    player.start();
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setTempoCronometro(minutos, segundos);
+                    }
+                });
+            }
+
+            private void contagemProgressiva() {
+                if (curSegundos == 59) {
+                    curSegundos = 0;
+                    curMinutos++;
+
+                } else {
+                    curSegundos++;
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setTempoCorrido(curMinutos, curSegundos);
+                    }
+                });
+            }
+        });
+
+        return cronometro;
     }
 }

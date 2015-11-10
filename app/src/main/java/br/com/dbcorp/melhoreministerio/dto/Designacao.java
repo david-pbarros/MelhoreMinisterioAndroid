@@ -65,6 +65,22 @@ public class Designacao implements Serializable {
         this.data = data;
     }
 
+    @Override
+    public int hashCode() {
+        return data.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof  Designacao) {
+            Designacao temp = (Designacao) o;
+
+            return data.equals(temp.getData()) && tipoDesignacao == temp.getTipoDesignacao();
+        }
+
+        return false;
+    }
+
     public Map<String, Object> toMap() {
         Map<String, Object> item = new HashMap<>();
         item.put("tipoDesignacao", tipoDesignacao.getLabel());

@@ -28,14 +28,13 @@
         android:background="@color/dialog_background">
 
         <TableRow>
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="&lt;"
                 android:id="@+id/btBack"
                 android:layout_gravity="center"
+                android:src="@drawable/previous"
                 android:clickable="true"
-                android:textAppearance="?attr/textAppearanceSemiLarge"
                 android:onClick="back"/>
 
             <TextView
@@ -114,7 +113,7 @@
                 android:layout_weight="3"
                 android:layout_height="wrap_content"
                 android:id="@+id/spAvaliacao"
-                android:spinnerMode="dropdown" />
+                android:spinnerMode="dropdown"/>
         </TableRow>
     </TableLayout>
 
@@ -159,7 +158,9 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="3dp"
-            android:src="@drawable/mute" />
+            android:src="@drawable/mute"
+            android:clickable="true"
+            android:onClick="mute"/>
 
     </RelativeLayout>
 
@@ -242,7 +243,9 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_marginBottom="3dp"
-            android:src="@drawable/restart" />
+            android:src="@drawable/restart"
+            android:clickable="true"
+            android:onClick="reset"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -258,7 +261,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="00:00"
             android:id="@+id/txTempoCor"
             android:layout_alignParentBottom="true"
             android:layout_alignBaseline="@+id/imgReset"

@@ -4,11 +4,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +27,51 @@ import br.com.dbcorp.melhoreministerio.dto.TipoDesignacao;
 import br.com.dbcorp.melhoreministerio.preferencias.PreferenciasActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener, DialogInterface.OnClickListener, AdapterView.OnItemClickListener {
+
+    //TODO: remover
+    private static List<Designacao> temp = new ArrayList<>();
+    static{
+        //TODO:substiruir linhas abaixo por vindas do banco
+        Designacao d = new Designacao();
+        d.setTipoDesignacao(TipoDesignacao.LEITURA);
+        d.setTempo("01:40");
+        d.setStatus("P");
+        d.setEstudante("Fulano Da Silva");
+        d.setAjudante("Sicrano Junior");
+        d.setFonte("IgT p.99");
+        d.setData(new Date());
+        temp.add(d);
+
+        d = new Designacao();
+        d.setTipoDesignacao(TipoDesignacao.VISITA);
+        d.setTempo("00:00");
+        d.setStatus("V");
+        d.setEstudante("Fulano Da Silva");
+        d.setAjudante("Sicrano Junior");
+        d.setFonte("IgT p.99");
+        d.setData(new Date());
+        temp.add(d);
+
+        d = new Designacao();
+        d.setTipoDesignacao(TipoDesignacao.REVISITA);
+        d.setTempo("00:00");
+        d.setStatus("V");
+        d.setEstudante("Fulano Da Silva");
+        d.setAjudante("Sicrano Junior");
+        d.setFonte("IgT p.99");
+        d.setData(new Date());
+        temp.add(d);
+
+        d = new Designacao();
+        d.setTipoDesignacao(TipoDesignacao.ESTUDO);
+        d.setTempo("00:00");
+        d.setStatus("V");
+        d.setEstudante("Fulano Da Silva");
+        d.setAjudante("Sicrano Junior");
+        d.setFonte("IgT p.99");
+        d.setData(new Date());
+        temp.add(d);
+    }
 
     private List<Date> datas;
     private List<Designacao> designacoes;
@@ -46,6 +97,36 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
         this.carregaDatas();
         this.setDesignacoes();
+
+        ImageView btOption = (ImageView) findViewById(R.id.btOpt);
+
+        if (ViewConfiguration.get(this).hasPermanentMenuKey()) {
+            (btOption).setVisibility(View.INVISIBLE);
+
+        } else {
+            registerForContextMenu(btOption);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.option) {
+            this.openOptions();
+            return true;
+
+        } else if (item.getItemId() == R.id.sinc) {
+
+            return true;
+        }
+
+        return false;
     }
 
     private void carregaDatas() {
@@ -76,66 +157,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
     }
 
-    private void setDesignacoes() {
-        SimpleAdapter adapter = new SimpleAdapter(this, this.itensDesignacao(), R.layout.list_designacao, de, para);
-
-        this.listaDesignacoes.setAdapter(adapter);
-    }
-
-    private List<Map<String, Object>> itensDesignacao() {
-        this.designacoes = new ArrayList<>();
-
-        List<Map<String, Object>> designacoesMap = new ArrayList<>();
-
-        //TODO:substiruir linhas abaixo por vindas do banco
-        Designacao d = new Designacao();
-        d.setTipoDesignacao(TipoDesignacao.LEITURA);
-        d.setTempo("00:00");
-        d.setStatus("V");
-        d.setEstudante("Fulano Da Silva" + this.index);
-        d.setAjudante("Sicrano Junior");
-        d.setFonte("IgT p.99");
-        d.setData(this.datas.get(this.index));
-        designacoes.add(d);
-
-        d = new Designacao();
-        d.setTipoDesignacao(TipoDesignacao.VISITA);
-        d.setTempo("00:00");
-        d.setStatus("V");
-        d.setEstudante("Fulano Da Silva" + this.index);
-        d.setAjudante("Sicrano Junior");
-        d.setFonte("IgT p.99");
-        d.setData(this.datas.get(this.index));
-        designacoes.add(d);
-
-        d = new Designacao();
-        d.setTipoDesignacao(TipoDesignacao.REVISITA);
-        d.setTempo("00:00");
-        d.setStatus("V");
-        d.setEstudante("Fulano Da Silva" + this.index);
-        d.setAjudante("Sicrano Junior");
-        d.setFonte("IgT p.99");
-        d.setData(this.datas.get(this.index));
-        designacoes.add(d);
-
-        d = new Designacao();
-        d.setTipoDesignacao(TipoDesignacao.ESTUDO);
-        d.setTempo("00:00");
-        d.setStatus("V");
-        d.setEstudante("Fulano Da Silva" + this.index);
-        d.setAjudante("Sicrano Junior");
-        d.setFonte("IgT p.99");
-        d.setData(this.datas.get(this.index));
-        designacoes.add(d);
-        //fim de linhas a substituir
-
-        for (Designacao designacao : this.designacoes) {
-            designacoesMap.add(designacao.toMap());
-        }
-
-        return designacoesMap;
-    }
-
     public void next(View view) {
        if (index + 1 < this.datas.size()) {
            this.txData.setText(sdf.format(this.datas.get(++index)));
@@ -151,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     public void options(View view) {
-        startActivity(new Intent(this, PreferenciasActivity.class));
+        openContextMenu(view);
     }
 
     @Override
@@ -182,6 +203,48 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent editar = new Intent(this, DesignacaoActivity.class);
         editar.putExtra("designacao", this.designacoes.get(position));
-        startActivity(editar);
+        startActivityForResult(editar, 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == 1) {
+            if (data.hasExtra("designacao")) {
+                //TODO: melhorar lógica
+
+                Designacao d1 = (Designacao) data.getExtras().getSerializable("designacao");
+                Designacao d = this.designacoes.get(this.designacoes.indexOf(d1));
+
+
+                d.setTempo(d1.getTempo());
+                d.setStatus(d1.getStatus());
+
+                this.setDesignacoes();
+            }
+        }
+    }
+
+    private void setDesignacoes() {
+        SimpleAdapter adapter = new SimpleAdapter(this, this.itensDesignacao(), R.layout.list_designacao, de, para);
+
+        this.listaDesignacoes.setAdapter(adapter);
+    }
+
+    private List<Map<String, Object>> itensDesignacao() {
+        //buscar do banco
+        this.designacoes = new ArrayList<>();
+        this.designacoes.addAll(temp);
+
+        List<Map<String, Object>> designacoesMap = new ArrayList<>();
+
+        for (Designacao designacao : this.designacoes) {
+            designacoesMap.add(designacao.toMap());
+        }
+
+        return designacoesMap;
+    }
+
+    private void openOptions() {
+        startActivity(new Intent(this, PreferenciasActivity.class));
     }
 }

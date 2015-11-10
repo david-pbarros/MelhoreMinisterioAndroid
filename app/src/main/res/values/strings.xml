@@ -23,6 +23,11 @@
 
     <string name="btnOK">OK</string>
 
+    <string name="tempo_df_leitura">4:03</string>
+    <string name="tempo_df_visita">2:03</string>
+    <string name="tempo_df_revisita">4:03</string>
+    <string name="tempo_df_estudo">6:03</string>
+
     <!-- imgDescription -->
     <string name="img_icone">icone</string>
     <string name="img_line">linha</string>
