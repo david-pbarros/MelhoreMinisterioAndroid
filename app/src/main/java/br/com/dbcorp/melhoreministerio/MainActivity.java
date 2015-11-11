@@ -1,15 +1,25 @@
+//https://www.google.com/design/icons/index.html#ic_notifications_off
 package br.com.dbcorp.melhoreministerio;
 
+import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.PopupMenu.OnMenuItemClickListener;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewConfiguration;
+import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -22,11 +32,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import br.com.dbcorp.melhoreministerio.dto.Avaliacao;
 import br.com.dbcorp.melhoreministerio.dto.Designacao;
 import br.com.dbcorp.melhoreministerio.dto.TipoDesignacao;
 import br.com.dbcorp.melhoreministerio.preferencias.PreferenciasActivity;
 
-public class MainActivity extends AppCompatActivity implements View.OnLongClickListener, DialogInterface.OnClickListener, AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements OnLongClickListener, OnClickListener, OnItemClickListener, OnMenuItemClickListener {
 
     //TODO: remover
     private static List<Designacao> temp = new ArrayList<>();
@@ -35,41 +46,45 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         Designacao d = new Designacao();
         d.setTipoDesignacao(TipoDesignacao.LEITURA);
         d.setTempo("01:40");
-        d.setStatus("P");
+        d.setStatus(Avaliacao.PASSOU);
         d.setEstudante("Fulano Da Silva");
         d.setAjudante("Sicrano Junior");
         d.setFonte("IgT p.99");
         d.setData(new Date());
+        d.setNrEstudo(1);
         temp.add(d);
 
         d = new Designacao();
         d.setTipoDesignacao(TipoDesignacao.VISITA);
         d.setTempo("00:00");
-        d.setStatus("V");
+        d.setStatus(Avaliacao.NAO_AVALIADO);
         d.setEstudante("Fulano Da Silva");
         d.setAjudante("Sicrano Junior");
         d.setFonte("IgT p.99");
         d.setData(new Date());
+        d.setNrEstudo(2);
         temp.add(d);
 
         d = new Designacao();
         d.setTipoDesignacao(TipoDesignacao.REVISITA);
         d.setTempo("00:00");
-        d.setStatus("V");
+        d.setStatus(Avaliacao.NAO_PASSOU);
         d.setEstudante("Fulano Da Silva");
         d.setAjudante("Sicrano Junior");
         d.setFonte("IgT p.99");
         d.setData(new Date());
+        d.setNrEstudo(3);
         temp.add(d);
 
         d = new Designacao();
         d.setTipoDesignacao(TipoDesignacao.ESTUDO);
         d.setTempo("00:00");
-        d.setStatus("V");
+        d.setStatus(Avaliacao.SUBSTITUIDO);
         d.setEstudante("Fulano Da Silva");
         d.setAjudante("Sicrano Junior");
         d.setFonte("IgT p.99");
         d.setData(new Date());
+        d.setNrEstudo(4);
         temp.add(d);
     }
 
@@ -78,11 +93,12 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private int index;
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-    private static final String de[] = {"tipoDesignacao", "tempo", "status", "estudante", "ajudante", "fonte"};
-    private static final int para[] = {R.id.tipoDesignacao, R.id.tempo, R.id.status, R.id.estudante, R.id.ajudante, R.id.fonte};
+    private static final String de[] = {"tipoDesignacao", "tempo", "status", "estudante", "ajudante", "fonte", "estudo"};
+    private static final int para[] = {R.id.tipoDesignacao, R.id.tempo, R.id.status, R.id.estudante, R.id.ajudante, R.id.fonte, R.id.estudo};
 
     private ListView listaDesignacoes;
     private TextView txData;
+    private PopupMenu popup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,32 +117,12 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         ImageView btOption = (ImageView) findViewById(R.id.btOpt);
 
         if (ViewConfiguration.get(this).hasPermanentMenuKey()) {
-            (btOption).setVisibility(View.INVISIBLE);
-
-        } else {
-            registerForContextMenu(btOption);
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-
-        return true;
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.option) {
-            this.openOptions();
-            return true;
-
-        } else if (item.getItemId() == R.id.sinc) {
-
-            return true;
+            (btOption).setVisibility(View.GONE);
         }
 
-        return false;
+        this.popup = new PopupMenu(this, btOption);
+        this.popup.getMenuInflater().inflate(R.menu.menu_main, this.popup.getMenu());
+        this.popup.setOnMenuItemClickListener(this);
     }
 
     private void carregaDatas() {
@@ -172,9 +168,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     }
 
     public void options(View view) {
-        openContextMenu(view);
+        this.popup.show();
     }
 
+    //OnLongClickListener
     @Override
     public boolean onLongClick(View v) {
         List<String> datas = new ArrayList<>();
@@ -191,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         return true;
     }
 
+    //OnClickListener
     @Override
     public void onClick(DialogInterface dialog, int which) {
         this.index = which;
@@ -199,11 +197,34 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         this.setDesignacoes();
     }
 
+    //OnItemClickListener
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent editar = new Intent(this, DesignacaoActivity.class);
         editar.putExtra("designacao", this.designacoes.get(position));
         startActivityForResult(editar, 1);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_MENU){
+            this.popup.show();
+
+            Toast.makeText(this, "teste", Toast.LENGTH_LONG).show();
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    //OnMenuItemClickListener
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        if (item.getItemId() == R.id.option) {
+            this.openOptions();
+
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

@@ -21,6 +21,9 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import br.com.dbcorp.melhoreministerio.dto.Avaliacao;
 import br.com.dbcorp.melhoreministerio.dto.Designacao;
@@ -33,6 +36,7 @@ public class DesignacaoActivity extends AppCompatActivity {
     private TextView lbEstudante;
     private TextView lbAjudante;
     private TextView lbFonte;
+    private TextView lbEstudo;
     private TextView txTempoDef;
     private TextView txMinCrono;
     private TextView txSecCrono;
@@ -40,6 +44,9 @@ public class DesignacaoActivity extends AppCompatActivity {
     private Spinner spAvaliacao;
     private MediaPlayer player;
     private SharedPreferences preferences;
+
+    private static final String de[] = {"imagem", "descricao"};
+    private static final int para[] = {R.id.imgStatus, R.id.txStatus};
 
     private int minutos;
     private int segundos;
@@ -60,6 +67,7 @@ public class DesignacaoActivity extends AppCompatActivity {
         this.lbEstudante = (TextView) findViewById(R.id.lbEstudante);
         this.lbAjudante = (TextView) findViewById(R.id.lbAjudante);
         this.lbFonte = (TextView) findViewById(R.id.lbFonte);
+        this.lbEstudo = (TextView) findViewById(R.id.lbEstudo);
         this.txTempoDef = (TextView) findViewById(R.id.txTempoDef);
         this.txMinCrono = (TextView) findViewById(R.id.minCrono);
         this.txSecCrono = (TextView) findViewById(R.id.secCrono);
@@ -87,7 +95,7 @@ public class DesignacaoActivity extends AppCompatActivity {
         this.player.release();
 
         this.designacao.setTempo((String) this.txTempoCor.getText());
-        this.designacao.setStatus(Avaliacao.values()[this.spAvaliacao.getSelectedItemPosition()].getSigla());
+        this.designacao.setStatus(Avaliacao.values()[this.spAvaliacao.getSelectedItemPosition()]);
 
         Intent data = new Intent();
         data.putExtra("designacao", this.designacao);
@@ -134,21 +142,29 @@ public class DesignacaoActivity extends AppCompatActivity {
         //TODO: modificar icone start
     }
 
-    private void setCamposTela() {
-        this.lbEstudante.setText(this.designacao.getEstudante());
-        this.lbAjudante.setText(this.designacao.getAjudante());
-        this.lbFonte.setText(this.designacao.getFonte());
-
-        String[] status = new String[Avaliacao.values().length];
+    private void setComboAvaliacao() {
+        List<Map<String, Object>> avaliacoes = new ArrayList<>();
 
         for (int i = 0; i < Avaliacao.values().length; i++) {
-            status[i] = Avaliacao.values()[i].getLabel();
+            Map<String, Object> opcao = new HashMap<>();
+            opcao.put("imagem", Designacao.getIconCode(Avaliacao.values()[i]));
+            opcao.put("descricao", Avaliacao.values()[i].getLabel());
+
+            avaliacoes.add(opcao);
         }
 
-        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_dropdown_item, status);
+        SimpleAdapter adapter = new SimpleAdapter(this, avaliacoes, R.layout.list_avaliacao, de, para);
         this.spAvaliacao.setAdapter(adapter);
+    }
 
-        this.spAvaliacao.setSelection(Avaliacao.getByInitials(this.designacao.getStatus()).ordinal());
+    private void setCamposTela() {
+        this.setComboAvaliacao();
+
+        this.lbEstudante.setText(this.designacao.getEstudante());
+        this.lbAjudante.setText(this.designacao.getAjudante());
+        this.lbEstudo.setText(this.designacao.getEstudo());
+        this.lbFonte.setText(this.designacao.getFonte());
+        this.spAvaliacao.setSelection(this.designacao.getStatus().ordinal());
     }
 
     private void setPlayer() {

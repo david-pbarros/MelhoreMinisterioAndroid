@@ -9,11 +9,34 @@ public class Designacao implements Serializable {
 
     private TipoDesignacao tipoDesignacao;
     private String tempo;
-    private String status;
+    private Avaliacao status;
     private String estudante;
     private String ajudante;
     private String fonte;
+    private int nrEstudo;
     private Date data;
+    private Map<Integer, String> estudos;
+
+    {
+        this.estudos = new HashMap<>();
+        this.estudos.put(1, "Estudo a");
+        this.estudos.put(2, "Estudo b");
+        this.estudos.put(3, "Estudo c");
+        this.estudos.put(4, "Estudo d");
+    }
+
+    public static int getIconCode(Avaliacao avaliacao) {
+        switch (avaliacao) {
+            case PASSOU:
+                return android.R.drawable.presence_online;
+            case NAO_PASSOU:
+                return android.R.drawable.presence_busy;
+            case SUBSTITUIDO:
+                return android.R.drawable.stat_notify_sync;
+            default:
+                return android.R.drawable.presence_invisible;
+        }
+    }
 
     public TipoDesignacao getTipoDesignacao() {
         return tipoDesignacao;
@@ -29,10 +52,10 @@ public class Designacao implements Serializable {
         this.tempo = tempo;
     }
 
-    public String getStatus() {
+    public Avaliacao getStatus() {
         return status;
     }
-    public void setStatus(String status) {
+    public void setStatus(Avaliacao status) {
         this.status = status;
     }
 
@@ -65,6 +88,13 @@ public class Designacao implements Serializable {
         this.data = data;
     }
 
+    public int getNrEstudo() {
+        return nrEstudo;
+    }
+    public void setNrEstudo(int nrEstudo) {
+        this.nrEstudo = nrEstudo;
+    }
+
     @Override
     public int hashCode() {
         return data.hashCode();
@@ -85,11 +115,16 @@ public class Designacao implements Serializable {
         Map<String, Object> item = new HashMap<>();
         item.put("tipoDesignacao", tipoDesignacao.getLabel());
         item.put("tempo", tempo);
-        item.put("status", status);
         item.put("estudante", "Estudante: " + estudante);
         item.put("ajudante", "Ajudante: " + ajudante);
         item.put("fonte", "Fonte: " + fonte);
+        item.put("status", Designacao.getIconCode(status));
+        item.put("estudo", "Estudo: " + this.getEstudo());
 
         return item;
+    }
+
+    public String getEstudo() {
+        return nrEstudo + " - " + this.estudos.get(nrEstudo);
     }
 }

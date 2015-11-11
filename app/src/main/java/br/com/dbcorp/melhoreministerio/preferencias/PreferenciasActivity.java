@@ -12,6 +12,7 @@ import android.preference.PreferenceFragment;
 import android.os.Bundle;
 import android.preference.PreferenceScreen;
 import android.preference.RingtonePreference;
+import android.preference.SwitchPreference;
 import android.widget.BaseAdapter;
 
 import br.com.dbcorp.melhoreministerio.R;
@@ -33,7 +34,7 @@ public class PreferenciasActivity extends PreferenceActivity {
         private EditTextPreference prefCong;
         private RingtonePreference ringPref;
         private PreferenceScreen somScreen;
-        private CheckBoxPreference chkSom;
+        private SwitchPreference chkSom;
 
         @Override
         public void onCreate(final Bundle savedInstanceState) {
@@ -43,7 +44,7 @@ public class PreferenciasActivity extends PreferenceActivity {
             this.prefCong = (EditTextPreference) findPreference("nrCong");
             this.ringPref = (RingtonePreference) findPreference("alarm");
             this.somScreen = (PreferenceScreen) findPreference("cat_som");
-            this.chkSom = (CheckBoxPreference) findPreference("som_pers");
+            this.chkSom = (SwitchPreference) findPreference("som_pers");
 
             this.prefCong.setOnPreferenceChangeListener(this);
             this.ringPref.setOnPreferenceChangeListener(this);
