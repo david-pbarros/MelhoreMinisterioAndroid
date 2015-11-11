@@ -6,7 +6,7 @@
     <string name="tema2">Escola do Ministério</string>
     <string name="tema3">Teocrático</string>
 
-    <string name="minutos">Minutos</string>
+    <string name="minutos">Minutos </string>
     <string name="segundos">Segundos</string>
 
     <string name="lbNome">Nome:</string>
@@ -18,6 +18,7 @@
     <string name="lbAvaliacao">Avaliação:</string>
     <string name="lbTempoDef">Tempo Definido:</string>
     <string name="lbTempoCorrido">Tempo Corrido:</string>
+    <string name="lbEstudo">Estudo:</string>
     <string name="lb">:</string>
 
 
@@ -45,19 +46,23 @@
 
     <string name="divConf">Configuração</string>
     <string name="divSobre">Sobre</string>
+    <string name="divSinc">Sincronismo</string>
 
     <string name="opTempo">Definir Tempo</string>
     <string name="opAlarme">Definir Alarme</string>
     <string name="opCong">Número da Congregação</string>
     <string name="opEmail">E-mail ao desenvolvedor</string>
     <string name="opVersao">Versão do Programa</string>
+    <string name="opSincIni">Sincronismo ao iniciar?</string>
+    <string name="opSincAuto">Sincronismo automático?</string>
+    <string name="opInterSinc">Intervalo de minutos</string>
 
     <string name="subOpLeitura">Leitura</string>
     <string name="subOpVisita">Visita</string>
     <string name="subOpRevisita">Revisita</string>
     <string name="subOpEstudo">Estudo</string>
 
-    <string name="subOpPerSom">Usar som personalizado</string>
+    <string name="subOpPerSom">Usar som personalizado?</string>
     <string name="subOpSom">Som</string>
 
     <string name="sumaryVersao">1.00</string>

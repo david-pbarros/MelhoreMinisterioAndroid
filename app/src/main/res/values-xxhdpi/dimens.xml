@@ -1,0 +1,15 @@
+<resources>
+
+  <!-- Default screen margins, per the Android Design guidelines. -->
+  <dimen name="activity_horizontal_margin">10dp</dimen>
+  <dimen name="activity_vertical_margin">10dp</dimen>
+  <dimen name="fab_margin">10dp</dimen>
+
+  <dimen name="TextAppearanceLargeSize">42sp</dimen>
+  <dimen name="TextAppearanceSize">24sp</dimen>
+  <dimen name="TextAppearanceSemiLargeSize">36sp</dimen>
+  <dimen name="TextBlackSize">28sp</dimen>
+  <dimen name="TextLabelSize">28sp</dimen>
+  <dimen name="TextSpinnerItemSize">32sp</dimen>
+
+</resources>

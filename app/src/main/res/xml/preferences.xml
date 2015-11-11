@@ -1,36 +1,48 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-<PreferenceCategory android:title="@string/divConf">
+    <PreferenceCategory android:title="@string/divConf">
 
-    <PreferenceScreen android:title="@string/opTempo">
-        <br.com.dbcorp.melhoreministerio.preferencias.DurationPreference
-            android:key="leitura_time"
-            android:title="@string/subOpLeitura"
-            android:defaultValue="@string/tempo_df_leitura"/>
+        <PreferenceScreen android:title="@string/opTempo">
+            <br.com.dbcorp.melhoreministerio.preferencias.DurationPreference
+                android:key="leitura_time"
+                android:title="@string/subOpLeitura"
+                android:defaultValue="@string/tempo_df_leitura"/>
 
-        <br.com.dbcorp.melhoreministerio.preferencias.DurationPreference
-            android:key="visita_time"
-            android:title="@string/subOpVisita"
-            android:defaultValue="@string/tempo_df_visita"/>
+            <br.com.dbcorp.melhoreministerio.preferencias.DurationPreference
+                android:key="visita_time"
+                android:title="@string/subOpVisita"
+                android:defaultValue="@string/tempo_df_visita"/>
 
-        <br.com.dbcorp.melhoreministerio.preferencias.DurationPreference
-            android:key="revisita_time"
-            android:title="@string/subOpRevisita"
-            android:defaultValue="@string/tempo_df_revisita"/>
+            <br.com.dbcorp.melhoreministerio.preferencias.DurationPreference
+                android:key="revisita_time"
+                android:title="@string/subOpRevisita"
+                android:defaultValue="@string/tempo_df_revisita"/>
 
-        <br.com.dbcorp.melhoreministerio.preferencias.DurationPreference
-            android:key="estudo_time"
-            android:title="@string/subOpEstudo"
-            android:defaultValue="@string/tempo_df_estudo"/>
-    </PreferenceScreen>
+            <br.com.dbcorp.melhoreministerio.preferencias.DurationPreference
+                android:key="estudo_time"
+                android:title="@string/subOpEstudo"
+                android:defaultValue="@string/tempo_df_estudo"/>
+        </PreferenceScreen>
 
-    <PreferenceScreen android:title="@string/opAlarme" android:key="cat_som" android:summary="teste">
-        <CheckBoxPreference android:title="@string/subOpPerSom" android:key="som_pers" android:defaultValue="false"/>
-        <RingtonePreference android:title="@string/subOpSom" android:ringtoneType="all" android:showSilent="false" android:showDefault="true" android:key="alarm" android:dependency="som_pers"/>
-    </PreferenceScreen>
+        <PreferenceScreen android:title="@string/opAlarme" android:key="cat_som" android:summary="teste">
+            <SwitchPreference android:title="@string/subOpPerSom" android:key="som_pers" android:defaultValue="false"/>
+            <RingtonePreference android:title="@string/subOpSom" android:ringtoneType="all" android:showSilent="false" android:showDefault="true" android:key="alarm" android:dependency="som_pers"/>
+        </PreferenceScreen>
 
-    <EditTextPreference android:key="nrCong"
-        android:title="@string/opCong"/>
+        <EditTextPreference android:key="nrCong"
+            android:title="@string/opCong"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/divSinc">
+        <SwitchPreference android:title="@string/opSincIni" android:key="sinc_ini" android:defaultValue="true"/>
+        <SwitchPreference android:title="@string/opSincAuto" android:key="sinc_auto" android:defaultValue="true"/>
+
+        <br.com.dbcorp.melhoreministerio.preferencias.NumberPreference
+            android:key="sinc_interv"
+            android:title="@string/opInterSinc"
+            android:defaultValue="5"
+            android:dependency="sinc_auto"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/divSobre">

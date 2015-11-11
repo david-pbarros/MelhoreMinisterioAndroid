@@ -4,15 +4,21 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -21,6 +27,9 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import br.com.dbcorp.melhoreministerio.dto.Avaliacao;
 import br.com.dbcorp.melhoreministerio.dto.Designacao;
@@ -33,13 +42,26 @@ public class DesignacaoActivity extends AppCompatActivity {
     private TextView lbEstudante;
     private TextView lbAjudante;
     private TextView lbFonte;
+    private TextView lbEstudo;
     private TextView txTempoDef;
     private TextView txMinCrono;
     private TextView txSecCrono;
     private TextView txTempoCor;
     private Spinner spAvaliacao;
+    private ImageView imgMute;
+    private ImageView btStart;
+
+    private Animation animation;
     private MediaPlayer player;
     private SharedPreferences preferences;
+
+    private int padrao;
+    private int ini;
+    private int warn;
+    private int outTime;
+
+    private static final String de[] = {"imagem", "descricao"};
+    private static final int para[] = {R.id.imgStatus, R.id.txStatus};
 
     private int minutos;
     private int segundos;
@@ -60,13 +82,23 @@ public class DesignacaoActivity extends AppCompatActivity {
         this.lbEstudante = (TextView) findViewById(R.id.lbEstudante);
         this.lbAjudante = (TextView) findViewById(R.id.lbAjudante);
         this.lbFonte = (TextView) findViewById(R.id.lbFonte);
+        this.lbEstudo = (TextView) findViewById(R.id.lbEstudo);
         this.txTempoDef = (TextView) findViewById(R.id.txTempoDef);
         this.txMinCrono = (TextView) findViewById(R.id.minCrono);
         this.txSecCrono = (TextView) findViewById(R.id.secCrono);
         this.txTempoCor = (TextView) findViewById(R.id.txTempoCor);
         this.spAvaliacao = (Spinner) findViewById(R.id.spAvaliacao);
+        this.imgMute = (ImageView) findViewById(R.id.imgMute);
+        this.btStart = (ImageView) findViewById(R.id.btStart);
+
+        this.animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.resize);
 
         this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        this.padrao = ContextCompat.getColor(this, R.color.text_default);
+        this.ini = ContextCompat.getColor(this, R.color.defTime);
+        this.warn = ContextCompat.getColor(this, R.color.warnTime);
+        this.outTime = ContextCompat.getColor(this, R.color.outTime);
 
         this.setCamposTela();
         this.setPlayer();
@@ -87,7 +119,7 @@ public class DesignacaoActivity extends AppCompatActivity {
         this.player.release();
 
         this.designacao.setTempo((String) this.txTempoCor.getText());
-        this.designacao.setStatus(Avaliacao.values()[this.spAvaliacao.getSelectedItemPosition()].getSigla());
+        this.designacao.setStatus(Avaliacao.values()[this.spAvaliacao.getSelectedItemPosition()]);
 
         Intent data = new Intent();
         data.putExtra("designacao", this.designacao);
@@ -103,7 +135,9 @@ public class DesignacaoActivity extends AppCompatActivity {
         } else {
             this.started = true;
             this.setCronometro().start();
-            //TODO: modificar icone start
+            this.btStart.setImageResource(R.drawable.stop);
+
+            this.setTempoOcorStyle(this.ini);
         }
     }
 
@@ -117,11 +151,19 @@ public class DesignacaoActivity extends AppCompatActivity {
 
         this.setTempoCorrido(this.curMinutos, this.curSegundos);
         this.setTempoMaximo();
+
+        this.setTempoOcorStyle(this.padrao);
     }
 
     public void mute(View view) {
         this.mudo = !this.mudo;
-        //TODO: modificar icone mudo
+
+        if (mudo) {
+            this.imgMute.setImageResource(R.drawable.mute);
+
+        } else {
+            this.imgMute.setImageResource(R.drawable.un_mute);
+        }
     }
 
     private void stopCron() {
@@ -131,24 +173,32 @@ public class DesignacaoActivity extends AppCompatActivity {
             this.player.stop();
         }
 
-        //TODO: modificar icone start
+        this.btStart.setImageResource(R.drawable.start);
+    }
+
+    private void setComboAvaliacao() {
+        List<Map<String, Object>> avaliacoes = new ArrayList<>();
+
+        for (int i = 0; i < Avaliacao.values().length; i++) {
+            Map<String, Object> opcao = new HashMap<>();
+            opcao.put("imagem", Designacao.getIconCode(Avaliacao.values()[i]));
+            opcao.put("descricao", Avaliacao.values()[i].getLabel());
+
+            avaliacoes.add(opcao);
+        }
+
+        SimpleAdapter adapter = new SimpleAdapter(this, avaliacoes, R.layout.list_avaliacao, de, para);
+        this.spAvaliacao.setAdapter(adapter);
     }
 
     private void setCamposTela() {
+        this.setComboAvaliacao();
+
         this.lbEstudante.setText(this.designacao.getEstudante());
         this.lbAjudante.setText(this.designacao.getAjudante());
+        this.lbEstudo.setText(this.designacao.getEstudo());
         this.lbFonte.setText(this.designacao.getFonte());
-
-        String[] status = new String[Avaliacao.values().length];
-
-        for (int i = 0; i < Avaliacao.values().length; i++) {
-            status[i] = Avaliacao.values()[i].getLabel();
-        }
-
-        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_dropdown_item, status);
-        this.spAvaliacao.setAdapter(adapter);
-
-        this.spAvaliacao.setSelection(Avaliacao.getByInitials(this.designacao.getStatus()).ordinal());
+        this.spAvaliacao.setSelection(this.designacao.getStatus().ordinal());
     }
 
     private void setPlayer() {
@@ -226,6 +276,13 @@ public class DesignacaoActivity extends AppCompatActivity {
     }
 
     private void setTempoCorrido(int minutos, int segundos) {
+        if (this.minutos == 0 && this.segundos > 20 && this.txTempoCor.getCurrentTextColor() != this.warn) {
+            this.setTempoOcorStyle(this.warn);
+
+        } else if (this.minutos == 0 && this.segundos <= 20) {
+            this.setTempoOcorStyle(this.outTime);
+        }
+
         this.txTempoCor.setText(leftZeros(Integer.toString(minutos)) + ":" + leftZeros(Integer.toString(segundos)));
     }
 
@@ -312,5 +369,11 @@ public class DesignacaoActivity extends AppCompatActivity {
         });
 
         return cronometro;
+    }
+
+    private void setTempoOcorStyle(int color) {
+        this.txTempoCor.startAnimation(this.animation);
+
+        this.txTempoCor.setTextColor(color);
     }
 }
