@@ -279,6 +279,8 @@
             android:layout_alignBaseline="@+id/imgReset"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="5dp"
             android:textSize="18sp" />
 
 

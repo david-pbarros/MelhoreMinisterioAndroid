@@ -48,10 +48,12 @@ public class DesignacaoActivity extends AppCompatActivity {
     private TextView txSecCrono;
     private TextView txTempoCor;
     private Spinner spAvaliacao;
-    private ImageView imgMute;
+    //private ImageView imgMute;
     private ImageView btStart;
+    //private ImageView imgReset;
 
     private Animation animation;
+    private Animation clickAnimation;
     private MediaPlayer player;
     private SharedPreferences preferences;
 
@@ -88,10 +90,10 @@ public class DesignacaoActivity extends AppCompatActivity {
         this.txSecCrono = (TextView) findViewById(R.id.secCrono);
         this.txTempoCor = (TextView) findViewById(R.id.txTempoCor);
         this.spAvaliacao = (Spinner) findViewById(R.id.spAvaliacao);
-        this.imgMute = (ImageView) findViewById(R.id.imgMute);
         this.btStart = (ImageView) findViewById(R.id.btStart);
 
         this.animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.resize);
+        this.clickAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.click);
 
         this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -107,6 +109,7 @@ public class DesignacaoActivity extends AppCompatActivity {
     }
 
     public void back(View view) {
+        view.setAnimation(this.clickAnimation);
         this.finish();
     }
 
@@ -128,7 +131,21 @@ public class DesignacaoActivity extends AppCompatActivity {
         super.finish();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+    }
+
     public void cronometro(View view) {
+        this.btStart.startAnimation(this.clickAnimation);
+
         if (this.started) {
             this.stopCron();
 
@@ -142,6 +159,8 @@ public class DesignacaoActivity extends AppCompatActivity {
     }
 
     public void reset(View view) {
+        view.startAnimation(this.clickAnimation);
+
         if (this.started) {
            this.stopCron();
         }
@@ -158,11 +177,13 @@ public class DesignacaoActivity extends AppCompatActivity {
     public void mute(View view) {
         this.mudo = !this.mudo;
 
+        view.startAnimation(this.clickAnimation);
+
         if (mudo) {
-            this.imgMute.setImageResource(R.drawable.mute);
+            ((ImageView)view).setImageResource(R.drawable.mute);
 
         } else {
-            this.imgMute.setImageResource(R.drawable.un_mute);
+            ((ImageView)view).setImageResource(R.drawable.un_mute);
         }
     }
 

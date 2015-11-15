@@ -5,7 +5,9 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.PopupMenu.OnMenuItemClickListener;
@@ -17,6 +19,8 @@ import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.ViewConfiguration;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -98,7 +102,13 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
 
     private ListView listaDesignacoes;
     private TextView txData;
+    private TextView txSala;
     private PopupMenu popup;
+
+    private Animation clickAnimation;
+    private SharedPreferences preferences;
+
+    private String sala;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,17 +118,19 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
         this.listaDesignacoes = (ListView) findViewById(R.id.designacaoList);
         this.listaDesignacoes.setOnItemClickListener(this);
 
+        this.txSala = (TextView) findViewById(R.id.txSala);
         this.txData = (TextView) findViewById(R.id.lbData);
+
         this.txData.setOnLongClickListener(this);
+
+        this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         this.carregaDatas();
         this.setDesignacoes();
 
         ImageView btOption = (ImageView) findViewById(R.id.btOpt);
 
-        if (ViewConfiguration.get(this).hasPermanentMenuKey()) {
-            (btOption).setVisibility(View.GONE);
-        }
+        this.clickAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.click);
 
         this.popup = new PopupMenu(this, btOption);
         this.popup.getMenuInflater().inflate(R.menu.menu_main, this.popup.getMenu());
@@ -154,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
     }
 
     public void next(View view) {
+       view.setAnimation(this.clickAnimation);
        if (index + 1 < this.datas.size()) {
            this.txData.setText(sdf.format(this.datas.get(++index)));
            this.setDesignacoes();
@@ -161,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
     }
 
     public void previous(View view) {
+        view.setAnimation(this.clickAnimation);
         if (index - 1 >= 0) {
             this.txData.setText(sdf.format(this.datas.get(--index)));
             this.setDesignacoes();
@@ -168,12 +182,19 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
     }
 
     public void options(View view) {
+        view.setAnimation(this.clickAnimation);
         this.popup.show();
+    }
+
+    public void mudaSala(View view) {
+        this.mudaSala();
     }
 
     //OnLongClickListener
     @Override
     public boolean onLongClick(View v) {
+        v.setAnimation(this.clickAnimation);
+
         List<String> datas = new ArrayList<>();
         datas.add("05/11/2015");
         datas.add("12/11/2015");
@@ -200,6 +221,8 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
     //OnItemClickListener
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        view.setAnimation(this.clickAnimation);
+
         Intent editar = new Intent(this, DesignacaoActivity.class);
         editar.putExtra("designacao", this.designacoes.get(position));
         startActivityForResult(editar, 1);
@@ -209,8 +232,6 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_MENU){
             this.popup.show();
-
-            Toast.makeText(this, "teste", Toast.LENGTH_LONG).show();
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -222,9 +243,30 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
             this.openOptions();
 
             return true;
+        } else if (item.getItemId() == R.id.btSala) {
+            this.mudaSala();
+            return true;
+
         } else {
             return false;
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString("data", this.txData.getText().toString());
+        outState.putInt("index", index);
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        this.txData.setText(savedInstanceState.getString("data"));
+        this.index = savedInstanceState.getInt("index");
     }
 
     @Override
@@ -246,9 +288,35 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
     }
 
     private void setDesignacoes() {
+        this.setSala();
+
         SimpleAdapter adapter = new SimpleAdapter(this, this.itensDesignacao(), R.layout.list_designacao, de, para);
 
         this.listaDesignacoes.setAdapter(adapter);
+    }
+
+    private void setSala() {
+        String sala = null;
+
+        if (this.sala == null) {
+            if (!this.preferences.contains("sala")) {
+                sala = "A";
+
+            } else {
+                sala = this.preferences.getString("sala", "A");
+            }
+
+        } else {
+            sala = this.sala;
+        }
+
+        SharedPreferences.Editor editor = this.preferences.edit();
+        editor.putString("sala", sala);
+        editor.commit();
+
+        this.txSala.setText("Sala " + sala);
+
+        this.sala = sala;
     }
 
     private List<Map<String, Object>> itensDesignacao() {
@@ -267,5 +335,10 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
 
     private void openOptions() {
         startActivity(new Intent(this, PreferenciasActivity.class));
+    }
+
+    private void mudaSala() {
+        this.sala = "A".equals(this.sala) ? "B" : "A";
+        this.setDesignacoes();
     }
 }

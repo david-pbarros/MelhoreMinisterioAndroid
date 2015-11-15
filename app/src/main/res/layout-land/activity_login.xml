@@ -102,6 +102,28 @@
 
         <TableRow
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/lnCong">
+
+            <TextView
+                style="@style/AppTheme.LoginBoxText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lbCong"
+                android:id="@+id/textCongregacao"
+                android:layout_column="1" />
+
+            <EditText
+                style="@style/AppTheme.LoginBoxText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:id="@+id/txCongregacao"
+                android:layout_column="4" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <ImageView

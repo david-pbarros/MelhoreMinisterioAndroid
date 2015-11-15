@@ -71,6 +71,27 @@
         android:layout_height="1dp"
         android:background="@drawable/dialog_line"/>
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAppearance="@style/AppTheme.TextAppearanceSemiLarge"
+            android:id="@+id/txSala"
+            android:textSize="@dimen/TextSizeTitle"
+            android:clickable="true"
+            android:onClick="mudaSala"/>
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/line"/>
+
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

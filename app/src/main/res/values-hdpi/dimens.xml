@@ -8,6 +8,7 @@
   <dimen name="TextAppearanceLargeSize">26sp</dimen>
   <dimen name="TextAppearanceSize">8sp</dimen>
   <dimen name="TextAppearanceSemiLargeSize">20sp</dimen>
+  <dimen name="TextSizeTitle">18sp</dimen>
   <dimen name="TextBlackSize">12sp</dimen>
   <dimen name="TextLabelSize">12sp</dimen>
   <dimen name="TextSpinnerItemSize">16sp</dimen>

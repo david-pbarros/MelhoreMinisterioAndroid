@@ -11,6 +11,7 @@
 
     <string name="lbNome">Nome:</string>
     <string name="lbSenha">Senha:</string>
+    <string name="lbCong">Congr.:</string>
     <string name="lbEstudante">Estudante:</string>
     <string name="lbAjudante">Ajudante:</string>
     <string name="lbTema">Tema:</string>
