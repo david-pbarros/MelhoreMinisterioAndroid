@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.media.AudioManager;
@@ -13,6 +14,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -48,9 +50,8 @@ public class DesignacaoActivity extends AppCompatActivity {
     private TextView txSecCrono;
     private TextView txTempoCor;
     private Spinner spAvaliacao;
-    //private ImageView imgMute;
+    private ImageView imgMute;
     private ImageView btStart;
-    //private ImageView imgReset;
 
     private Animation animation;
     private Animation clickAnimation;
@@ -91,6 +92,7 @@ public class DesignacaoActivity extends AppCompatActivity {
         this.txTempoCor = (TextView) findViewById(R.id.txTempoCor);
         this.spAvaliacao = (Spinner) findViewById(R.id.spAvaliacao);
         this.btStart = (ImageView) findViewById(R.id.btStart);
+        this.imgMute = (ImageView) findViewById(R.id.imgMute);
 
         this.animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.resize);
         this.clickAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.click);
@@ -106,6 +108,8 @@ public class DesignacaoActivity extends AppCompatActivity {
         this.setPlayer();
         this.setTempoMaximo();
         this.txTempoCor.setText(this.designacao.getTempo());
+
+        //this.lbFonte.setText(new ScreenTest().test(this));
     }
 
     public void back(View view) {
@@ -135,12 +139,36 @@ public class DesignacaoActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        outState.putInt("minutos", this.minutos);
+        outState.putInt("segundos", this.segundos);
+        outState.putInt("curMinutos", this.curMinutos);
+        outState.putInt("curSegundos", this.curSegundos);
+        outState.putInt("avaliacao", this.spAvaliacao.getSelectedItemPosition());
+        outState.putBoolean("mudo", this.mudo);
+        outState.putBoolean("started", this.started);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
+        this.minutos = savedInstanceState.getInt("minutos");
+        this.segundos = savedInstanceState.getInt("segundos");
+        this.curMinutos = savedInstanceState.getInt("curMinutos");
+        this.curSegundos = savedInstanceState.getInt("curSegundos");
+        this.mudo = savedInstanceState.getBoolean("mudo");
+
+        this.spAvaliacao.setSelection(savedInstanceState.getInt("avaliacao"));
+
+        if (this.mudo) {
+            this.imgMute.setImageResource(R.drawable.mute);
+        }
+
+        this.setTempoCorrido(this.curMinutos, this.curSegundos);
+
+        if (savedInstanceState.getBoolean("started")) {
+            this.startCron();
+        }
     }
 
     public void cronometro(View view) {
@@ -150,11 +178,7 @@ public class DesignacaoActivity extends AppCompatActivity {
             this.stopCron();
 
         } else {
-            this.started = true;
-            this.setCronometro().start();
-            this.btStart.setImageResource(R.drawable.stop);
-
-            this.setTempoOcorStyle(this.ini);
+            this.startCron();
         }
     }
 
@@ -195,6 +219,14 @@ public class DesignacaoActivity extends AppCompatActivity {
         }
 
         this.btStart.setImageResource(R.drawable.start);
+    }
+
+    private void startCron() {
+        this.started = true;
+        this.setCronometro().start();
+        this.btStart.setImageResource(R.drawable.stop);
+
+        this.setTempoOcorStyle(this.ini);
     }
 
     private void setComboAvaliacao() {
