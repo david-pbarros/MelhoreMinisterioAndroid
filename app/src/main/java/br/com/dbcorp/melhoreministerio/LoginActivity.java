@@ -41,9 +41,11 @@ public class LoginActivity extends AppCompatActivity {
     public void login(View view) {
         //TODO: ajustar login
 
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("nrCong", this.txCongregacao.getText().toString());
-        editor.commit();
+        if (this.lnCong.getVisibility() != View.GONE) {
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("nrCong", this.txCongregacao.getText().toString());
+            editor.commit();
+        }
 
         startActivity(new Intent(this, MainActivity.class));
 
