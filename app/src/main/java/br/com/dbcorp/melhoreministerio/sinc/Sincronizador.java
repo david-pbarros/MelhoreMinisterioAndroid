@@ -266,8 +266,6 @@ public class Sincronizador {
 
 		String keyString = new String(hash, "UTF-8");
 
-        keyString = keyString.replace("\r\n", "");
-		
 		try {
             PEMReader pemReader = new PEMReader(new StringReader(keyString));
 
@@ -297,6 +295,6 @@ public class Sincronizador {
 		
 		byte[] ciphered = cipher.doFinal(hash.toString().getBytes());
 		
-		this.hash = Base64.toBase64String(ciphered);
+		this.hash = android.util.Base64.encodeToString(ciphered, android.util.Base64.URL_SAFE);
 	}
 }

@@ -9,14 +9,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TableRow;
 
-import org.bouncycastle.util.encoders.Base64;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import br.com.dbcorp.melhoreministerio.DialogHelper.ButtonType;
 import br.com.dbcorp.melhoreministerio.dto.Usuario;
 import br.com.dbcorp.melhoreministerio.sinc.Sincronizador;
+
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -98,6 +96,6 @@ public class LoginActivity extends AppCompatActivity {
         MessageDigest mDigest = MessageDigest.getInstance("SHA1");
         byte[] result = mDigest.digest(senha.getBytes());
 
-        return Base64.toBase64String(result);
+        return android.util.Base64.encodeToString(result, android.util.Base64.DEFAULT);
     }
 }
