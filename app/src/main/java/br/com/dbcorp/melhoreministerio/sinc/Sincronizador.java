@@ -1,5 +1,9 @@
 package br.com.dbcorp.melhoreministerio.sinc;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.util.encoders.Base64;
@@ -18,13 +22,30 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import br.com.dbcorp.melhoreministerio.Sessao;
+
 public class Sincronizador {
 
+	private static final String chave = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0NCk1JR2ZNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0R05BRENCaVFLQmdRQzNwbVVNVVEvNDRvN3h2TDJIUmhWUC8ycVYNCkEvTkRCRGZGdENrbFJldU1iTGNRa1k1UlVqU05JaFBZdlFpN3V3dG52NUdWZ1RaK1BreU55UmdPdnUvTGlhKysNCm4yeFJLMDhma05xdkxNR2trZFg0VWo5Q0V5U2hsNEFGRXZCeVpDTjFiOU52cGVWVzJ5dmY5eUl1eXVtUjV2SjgNCmxMbXVPSXZQZmpHTkkvUkJQd0lEQVFBQg0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t";
 
-	private PublicKey chave;
+	private Sessao sessao;
+
+	private Context contexto;
+	private SharedPreferences preferences;
+	
+	private PublicKey chavePublica;
 	//private Sincronismo ultimaSincronia;
 	private String hash;
 	private StringBuffer mensagensTela;
+	
+	public Sincronizador(Context contexto) {
+		this.contexto = contexto;
+
+		this.preferences = PreferenceManager.getDefaultSharedPreferences(this.contexto);
+
+		this.sessao = Sessao.getInstance();
+	}
+	
 	
 	public void verificaSinc() {
 		try {
@@ -241,31 +262,38 @@ public class Sincronizador {
 		    Security.addProvider(new BouncyCastleProvider());
 		}
 		
-		byte[] hash = Base64.decode("chavepublica");
+		byte[] hash = Base64.decode(chave);
 
 		String keyString = new String(hash, "UTF-8");
+
+        keyString = keyString.replace("\r\n", "");
 		
-		 PEMReader pemReader= new PEMReader(new StringReader(keyString));
-		 this.chave = (PublicKey) pemReader.readObject();
-		 
-		 pemReader.close();
+		try {
+            PEMReader pemReader = new PEMReader(new StringReader(keyString));
+
+            this.chavePublica = (PublicKey) pemReader.readObject();
+
+            pemReader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 	}
 	
 	private void gerarHash() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-		//StringBuffer hash = new StringBuffer(Params.propriedades().getProperty("congregacao")).append(";");
-		
-		/*if (this.gerenciador.getUser() != null) {
-			hash.append(this.gerenciador.getUser().getNome()).append(";")
-				.append(this.gerenciador.getUser().getSenha()).append(";");
-		
+		StringBuffer hash = new StringBuffer(this.preferences.getString("nrCong", "")).append(";");
+
+		if (this.sessao.getUsuarioLogado() != null) {
+			hash.append(this.sessao.getUsuarioLogado().getNome()).append(";")
+					.append(this.sessao.getUsuarioLogado().getSenha()).append(";");
+
 		} else {
 			hash.append(";").append(";");
 		}
 		
-		hash.append(Params.propriedades().get("verionNumber"));*/
+		hash.append(100);
 		
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding", "BC");
-		cipher.init(Cipher.ENCRYPT_MODE, this.chave);
+		cipher.init(Cipher.ENCRYPT_MODE, this.chavePublica);
 		
 		byte[] ciphered = cipher.doFinal(hash.toString().getBytes());
 		

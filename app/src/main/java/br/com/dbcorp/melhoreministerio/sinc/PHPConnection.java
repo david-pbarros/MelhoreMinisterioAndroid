@@ -16,7 +16,7 @@ import org.json.JSONObject;
 
 public class PHPConnection {
 
-	private static final String url = "";
+	private static final String url = "http://127.0.0.1:81/escolaWS";
 
 	public enum HTTP_METHOD {
 		GET, POST, PUT, DELETE;
@@ -27,8 +27,8 @@ public class PHPConnection {
 	private String hash;
 	private Map<String, Object> parameters;
 	
-	public PHPConnection(String url, HTTP_METHOD method, String hash) throws IOException {
-		this.createConn(new URL(url), method);
+	public PHPConnection(String urlComp, HTTP_METHOD method, String hash) throws IOException {
+		this.createConn(new URL(url + urlComp), method);
 		
 		this.parameters = new HashMap<String, Object>();
 		this.hash = hash.replace("+", "%2B");
