@@ -7,15 +7,18 @@ import android.preference.PreferenceManager;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.util.encoders.Base64;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URLDecoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.Security;
+import java.text.SimpleDateFormat;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -23,6 +26,13 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import br.com.dbcorp.melhoreministerio.Sessao;
+import br.com.dbcorp.melhoreministerio.dto.Avaliacao;
+import br.com.dbcorp.melhoreministerio.dto.Designacao;
+import br.com.dbcorp.melhoreministerio.dto.Estudo;
+import br.com.dbcorp.melhoreministerio.dto.TipoDesignacao;
+import br.com.dbcorp.melhoreministerio.dto.Usuario;
+
+import static br.com.dbcorp.melhoreministerio.sinc.PHPConnection.HTTP_METHOD;
 
 public class Sincronizador {
 
@@ -45,104 +55,13 @@ public class Sincronizador {
 
 		this.sessao = Sessao.getInstance();
 	}
-	
-	
-	public void verificaSinc() {
-		try {
-			this.obterChave();
-			this.gerarHash();
-			
-			PHPConnection con = new PHPConnection("/service.php/lastSinc", PHPConnection.HTTP_METHOD.GET, this.hash);
-			con.connect();
-			
-			if (con.getResponseCode() != 200) {
-				throw new RuntimeException(con.getErrorDetails());
-			}
-			
-			JSONObject obj = con.getResponse();
-			
-			if (obj != null) {
-				if ("existente".equalsIgnoreCase(obj.getString("response"))) {
-					//LocalDateTime temp = LocalDateTime.parse(obj.getString("data"), br.com.dbcorp.escolaMinisterio.ui.Params.dateTimeFormate());
-					
-					//Params.propriedades().put("doSinc", this.gerenciador.pegarUltimo().getData().isBefore(temp));
-					
-				} else {
-					//Params.propriedades().put("doSinc", true);
-				}
-			}
-		} catch (Exception ex) {
-			//Params.propriedades().put("doSinc", true);
-		}
-	}
-	
-	public void finalizaSinc(boolean hasErro) {
-		try {
-			this.obterChave();
-			this.gerarHash();
-			
-			PHPConnection con = new PHPConnection("/service.php/lastSinc", PHPConnection.HTTP_METHOD.POST, this.hash);
-			con.setParameter("status", hasErro ? "I" : "C");
-			con.connect();
-			
-			if (con.getResponseCode() != 200) {
-				throw new RuntimeException(con.getErrorDetails());
-			}
-		} catch (Exception ex) {
-			//Params.propriedades().put("doSinc", true);
-		}
-	}
-	
-	public String versao() {
-		String retorno = "";
-		
-		try {
-			this.obterChave();
-			this.gerarHash();
-			
-			PHPConnection con = new PHPConnection("/service.php/versao", PHPConnection.HTTP_METHOD.GET, this.hash);
-			con.connect();
-			
-			if (con.getResponseCode() != 200) {
-				throw new RuntimeException(con.getErrorDetails());
-			}
-			
-			JSONObject obj = con.getResponse();
-			
-			if (obj != null) {
-				int versao = (int) 0;//Params.propriedades().get("verionNumber");
-				
-				if (versao < obj.getInt("versao")) {
-					retorno = "\nExiste nova vers�o do sistema para download.";
-					
-					String msg = obj.getString("msg");
-					
-					if (msg.length() > 0) {
-						retorno += "\n" + msg;
-					}
-				}
-			}
-		} catch (Exception ex) {
-			retorno =  "";
-		}
-		
-		return retorno;
-	}
-	
-	public void verificaVersao() {
-		String retorno = this.versao();
-		
-		if (!"".equals(retorno)) {
-			//JOptionPane.showMessageDialog(null, retorno, "Nova Vers�o", JOptionPane.INFORMATION_MESSAGE);
-		}
-	}
-	
+
 	public boolean login() {
 		try {
 			this.obterChave();
 			this.gerarHash();
 			
-			PHPConnection con = new PHPConnection("/service.php/logon", PHPConnection.HTTP_METHOD.POST, this.hash);
+			PHPConnection con = new PHPConnection("/service.php/mobile/logon", HTTP_METHOD.POST, this.hash);
 			con.connect();
 			
 			if (con.getResponseCode() != 200) {
@@ -154,107 +73,157 @@ public class Sincronizador {
 			return "OK".equalsIgnoreCase(obj.getString("response"));
 			
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			return false;
 		}
 	}
-	
-	/*public void sincronizarSeguranca() {
-		Sincronismo sinc  = new Sincronismo();
-		sinc.setSucesso(true);
-		
+
+	public void sincronismoGeral() {
 		try {
 			this.obterChave();
 			this.gerarHash();
-			
-			this.ultimaSincronia = this.gerenciador.pegarUltimo();
-			
-			this.profile = new ProfileSinc(this.gerenciador, this.ultimaSincronia, this.hash);
-			this.itemProfile = new ItemProfileSinc(this.gerenciador, this.ultimaSincronia, this.hash);
-			this.usuario = new UsuarioSinc(this.gerenciador, this.ultimaSincronia, this.hash);
-			
-			this.refreshMsg("\nObtendo novos perfis...");
-			if (!this.hasError("\nProblemas nos profiles recebidos:", this.profile.obterNovos())) {
-				this.refreshMsg("\nObtendo novos itens de seguran�a...");
-				if (!this.hasError("\nProblemas nos itens de seguran�a recebidos:", this.itemProfile.obterNovos())) {
-					this.refreshMsg("\nObtendo novos usuarios...");
-					this.hasError("\nProblemas nos usuarios recebidos:", this.usuario.obterNovos());
+
+			this.logins();
+			this.estudos();
+			this.designacoes();
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public String logins() throws Exception {
+		PHPConnection con = new PHPConnection("/service.php/mobile/usuarios", HTTP_METHOD.GET, this.hash);
+		con.connect();
+
+		if (con.getResponseCode() != 200) {
+			throw new RuntimeException(con.getErrorDetails());
+		}
+
+		JSONObject obj = con.getResponse();
+
+		if ("ok".equalsIgnoreCase(obj.getString("response"))) {
+			JSONArray array = obj.getJSONArray("itens");
+
+			for (int i = 0; i < array.length(); i++) {
+				JSONObject item = array.getJSONObject(i);
+
+				Usuario usuario = new Usuario();//this.gerenciador.obterUsuario(item.getString("id"));
+
+				usuario.setBloqueado(item.getInt("bloqueado") == 1 ? true : false);
+				usuario.setSenha(item.getString("senha"));
+				usuario.setNome(URLDecoder.decode(item.getString("nome"), "UTF-8"));
+
+				if (usuario.getIdonline() == null) {
+					usuario.setIdonline(item.getString("id"));
+					//this.gerenciador.salvar(usuario);
+
+				} else {
+					//this.gerenciador.atualizar(usuario);
 				}
 			}
-			
-			this.refreshMsg("\nFim do sincronismo. Reinicie o sistema.");
-			
-		} catch (Exception ex) {
-			String erro = "Erro inesperado durante o sincronismo de informa��es.";
-			this.log.error(erro, ex);
-			
-			this.refreshMsg("\n" + erro+ " Consultar Log.");
-			
-			sinc.setSucesso(false);
+		} else if ("ERRO".equalsIgnoreCase(obj.getString("response"))) {
+			return "\n" + obj.getString("mensagem");
 		}
-		
-		sinc.setData(LocalDateTime.now());
-		this.gerenciador.salvar(sinc);
-	}*/
-	
-	public void sincronizar() {
-		/*boolean hasErro = false;
-		
-		Sincronismo sinc = new Sincronismo();
-		
+
+		return "";
+	}
+
+	private String estudos() throws Exception {
+		PHPConnection con = new PHPConnection("/service.php/mobile/estudo", HTTP_METHOD.GET, this.hash);
+		con.connect();
+
+		if (con.getResponseCode() != 200) {
+			throw new RuntimeException(con.getErrorDetails());
+		}
+
+		JSONObject obj = con.getResponse();
+
+		if ("ok".equalsIgnoreCase(obj.getString("response"))) {
+			JSONArray array = obj.getJSONArray("itens");
+
+			for (int i = 0; i < array.length(); i++) {
+				JSONObject item = array.getJSONObject(i);
+
+				Estudo estudo = new Estudo();//this.gerenciador.obterEstudo(item.getInt("nrestudo"));
+
+				estudo.setDescricao(URLDecoder.decode(item.getString("descricao"), "UTF-8"));
+
+				if (estudo.getNrEstudo() == 0) {
+					estudo.setNrEstudo(item.getInt("nrestudo"));
+					//this.gerenciador.salvar(estudo);
+
+				} else {
+					//this.gerenciador.atualizar(estudo);
+				}
+			}
+		} else if ("ERRO".equalsIgnoreCase(obj.getString("response"))) {
+			return "\n" + obj.getString("mensagem");
+		}
+
+		return "";
+	}
+
+	private String designacoes() {
 		try {
-			
-			this.obterChave();
-			this.gerarHash();
-			
-			this.gerenciador.apagarVelhos();
-			this.ultimaSincronia = this.gerenciador.pegarUltimo();
-			Sincronismo ultimoSeguranca = this.gerenciador.pegarUltimoSeguranca();
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-			this.mes = new MesSinc(this.gerenciador, this.ultimaSincronia, this.hash);
-			this.ajudante = new AjudanteSinc(this.gerenciador, this.ultimaSincronia, this.hash);
-			this.estudante = new EstudanteSinc(this.gerenciador, this.ultimaSincronia, this.hash);
-			this.estudo = new EstudoSinc(this.gerenciador, this.ultimaSincronia, this.hash);
-			this.profile = new ProfileSinc(this.gerenciador, ultimoSeguranca, this.hash);
-			this.itemProfile = new ItemProfileSinc(this.gerenciador, ultimoSeguranca, this.hash);
-			this.usuario = new UsuarioSinc(this.gerenciador, ultimoSeguranca, this.hash);
-			this.semana = new SemanaSinc(this.gerenciador, this.ultimaSincronia, this.hash);
-			this.designacao = new DesignacaoSinc(this.gerenciador, this.ultimaSincronia, this.hash);
-			
-			this.refreshMsg("\nDesfragmentando a base...");
-			this.gerenciador.desfragmentarBase();
+			PHPConnection con = new PHPConnection("/service.php/mobile/designacao", HTTP_METHOD.GET, this.hash);
+			con.connect();
 
-			hasErro = true;
-			
-			if (this.apagarLocal()) {
-				if (this.apagaWeb()) {
-					if (this.enviarNovos()) {
-						if (this.atualizarWeb()) {
-							if (this.obterNovos()) {
-								hasErro = false;
-								Params.propriedades().put("doSinc", false);
-							}
-						}
+			if (con.getResponseCode() != 200) {
+				throw new RuntimeException(con.getErrorDetails());
+			}
+
+			JSONObject obj = con.getResponse();
+
+			if ("ok".equalsIgnoreCase(obj.getString("response"))) {
+				JSONArray array = obj.getJSONArray("itens");
+
+				for (int i = 0; i < array.length(); i++) {
+					JSONObject item = array.getJSONObject(i);
+
+					Designacao designacao = new Designacao();//this.gerenciador.obterDesignacao(item.getString("id"));
+
+					designacao.setData(sdf.parse(item.getString("data")));
+					designacao.setFonte(URLDecoder.decode(item.getString("fonte"), "UTF-8"));
+					designacao.setSala(item.getString("sala"));
+					designacao.setAjudante(item.getString("ajudante"));
+					designacao.setEstudante(item.getString("estudante"));
+					designacao.setNrEstudo(item.getInt("nrestudo"));
+					designacao.setStatus(Avaliacao.getByInitials(item.getString("status")));
+
+					switch (item.getInt("numero")) {
+						case 1:
+							designacao.setTipoDesignacao(TipoDesignacao.LEITURA);
+							break;
+						case 2:
+							designacao.setTipoDesignacao(TipoDesignacao.VISITA);
+							break;
+						case 3:
+							designacao.setTipoDesignacao(TipoDesignacao.REVISITA);
+							break;
+						case 4:
+							designacao.setTipoDesignacao(TipoDesignacao.ESTUDO);
+							break;
+					}
+
+					if (designacao.getIdOnline() == null) {
+						designacao.setIdOnline(item.getString("id"));
+						//this.gerenciador.salvar(estudo);
+
+					} else {
+						//this.gerenciador.atualizar(estudo);
 					}
 				}
+			} else if ("ERRO".equalsIgnoreCase(obj.getString("response"))) {
+				return "\n" + obj.getString("mensagem");
 			}
-			
-			this.finalizaSinc(hasErro);
-			
-			this.refreshMsg("\nFim do sincronismo. Reinicie o sistema.");
-			
 		} catch (Exception ex) {
-			String erro = "Erro inesperado durante o sincronismo de informa��es.";
-			this.log.error(erro, ex);
-			
-			this.refreshMsg("\n" + erro + " Consultar Log.");
-			
-			hasErro = true;
+			ex.printStackTrace();
 		}
-		
-		sinc.setData(LocalDateTime.now());
-		sinc.setSucesso(!hasErro);
-		
-		this.gerenciador.salvar(sinc);*/
+
+		return "";
 	}
 	
 	private void obterChave() throws IOException {
@@ -295,6 +264,6 @@ public class Sincronizador {
 		
 		byte[] ciphered = cipher.doFinal(hash.toString().getBytes());
 		
-		this.hash = android.util.Base64.encodeToString(ciphered, android.util.Base64.URL_SAFE);
+		this.hash = android.util.Base64.encodeToString(ciphered, android.util.Base64.NO_WRAP);
 	}
 }

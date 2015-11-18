@@ -8,6 +8,7 @@ import java.util.Map;
 public class Designacao implements Serializable {
 
     private TipoDesignacao tipoDesignacao;
+    private String idOnline;
     private String tempo;
     private Avaliacao status;
     private String estudante;
@@ -15,7 +16,8 @@ public class Designacao implements Serializable {
     private String fonte;
     private int nrEstudo;
     private Date data;
-    private Map<Integer, String> estudos;
+    private String sala;
+    private Map<Integer, String> estudos;//todo remover
 
     {
         this.estudos = new HashMap<>();
@@ -43,6 +45,13 @@ public class Designacao implements Serializable {
     }
     public void setTipoDesignacao(TipoDesignacao tipoDesignacao) {
         this.tipoDesignacao = tipoDesignacao;
+    }
+
+    public String getIdOnline() {
+        return idOnline;
+    }
+    public void setIdOnline(String idOnline) {
+        this.idOnline = idOnline;
     }
 
     public String getTempo() {
@@ -93,6 +102,13 @@ public class Designacao implements Serializable {
     }
     public void setNrEstudo(int nrEstudo) {
         this.nrEstudo = nrEstudo;
+    }
+
+    public String getSala() {
+        return sala;
+    }
+    public void setSala(String sala) {
+        this.sala = sala;
     }
 
     @Override

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TableRow;
@@ -12,6 +13,7 @@ import android.widget.TableRow;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import br.com.dbcorp.melhoreministerio.DialogHelper.ButtonType;
 import br.com.dbcorp.melhoreministerio.dto.Usuario;
 import br.com.dbcorp.melhoreministerio.sinc.Sincronizador;
 
@@ -26,6 +28,8 @@ public class LoginActivity extends AppCompatActivity {
     private TableRow lnCong;
 
     private SharedPreferences preferences;
+
+    private boolean loginWebOK;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,53 +53,72 @@ public class LoginActivity extends AppCompatActivity {
 
 
     public void login(View view) {
-        //TODO: ajustar login
-
         Usuario user = new Usuario();
         user.setNome("admin");
 
         try {
             user.setSenha(this.criptoSenha("1"));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            new DialogHelper(this)
+                    .setTitle("Login", R.mipmap.ic_launcher)
+                    .setMessage("Erro no processo de Login!")
+                    .setbutton("OK", ButtonType.NEUTRAL, null)
+                    .show();
         }
 
         this.sessao.setUsuarioLogado(user);
 
         if (this.lnCong.getVisibility() != View.GONE) {
-            SharedPreferences.Editor editor = preferences.edit();
+            SharedPreferences.Editor editor = this.preferences.edit();
             editor.putString("nrCong", this.txCongregacao.getText().toString());
             editor.commit();
         }
 
-        Sincronizador sinc  = new Sincronizador(this);
-        sinc.login();
+        final Sincronizador sinc  = new Sincronizador(this);
 
+        Thread login = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                loginWebOK = sinc.login();
+            };
+        });
 
+        while (login.isAlive()) {
+            //espera.......
+        }
 
-        startActivity(new Intent(this, MainActivity.class));
-
-        finish();
-
-        /*if (this.txNome.getText().toString().equals("a") && this.txSenha.getText().toString().equals("a")) {
-            startActivity(new Intent(this, MainActivity.class));
-
-            finish();
-
+        if (loginWebOK) {
+            this.proximo();
 
         } else {
+            //TODO: login soh pela web, verificar login local antes do popup
+
             new DialogHelper(this)
                     .setTitle("Login", R.mipmap.ic_launcher)
                     .setMessage("Login Inválido!")
                     .setbutton("OK", ButtonType.NEUTRAL, null)
                     .show();
-        }*/
+        }
     }
 
-    public String criptoSenha(String senha) throws NoSuchAlgorithmException {
+    private String criptoSenha(String senha) throws NoSuchAlgorithmException {
         MessageDigest mDigest = MessageDigest.getInstance("SHA1");
         byte[] result = mDigest.digest(senha.getBytes());
 
-        return android.util.Base64.encodeToString(result, android.util.Base64.DEFAULT);
+        return android.util.Base64.encodeToString(result, Base64.NO_WRAP);
+    }
+
+    private void proximo() {
+        this.sincGeral();
+
+        startActivity(new Intent(this, MainActivity.class));
+
+        finish();
+    }
+
+    private void sincGeral() {
+        if (this.preferences.getBoolean("sinc_ini", false)) {
+
+        }
     }
 }
