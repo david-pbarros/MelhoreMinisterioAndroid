@@ -8,6 +8,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.util.encoders.Base64;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -18,7 +19,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.Security;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -26,6 +29,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import br.com.dbcorp.melhoreministerio.Sessao;
+import br.com.dbcorp.melhoreministerio.db.DataBaseHelper;
 import br.com.dbcorp.melhoreministerio.dto.Avaliacao;
 import br.com.dbcorp.melhoreministerio.dto.Designacao;
 import br.com.dbcorp.melhoreministerio.dto.Estudo;
@@ -39,21 +43,24 @@ public class Sincronizador {
 	private static final String chave = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0NCk1JR2ZNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0R05BRENCaVFLQmdRQzNwbVVNVVEvNDRvN3h2TDJIUmhWUC8ycVYNCkEvTkRCRGZGdENrbFJldU1iTGNRa1k1UlVqU05JaFBZdlFpN3V3dG52NUdWZ1RaK1BreU55UmdPdnUvTGlhKysNCm4yeFJLMDhma05xdkxNR2trZFg0VWo5Q0V5U2hsNEFGRXZCeVpDTjFiOU52cGVWVzJ5dmY5eUl1eXVtUjV2SjgNCmxMbXVPSXZQZmpHTkkvUkJQd0lEQVFBQg0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t";
 
 	private Sessao sessao;
+	private DataBaseHelper dbHelper;
 
 	private Context contexto;
 	private SharedPreferences preferences;
 	
 	private PublicKey chavePublica;
-	//private Sincronismo ultimaSincronia;
 	private String hash;
 	private StringBuffer mensagensTela;
-	
-	public Sincronizador(Context contexto) {
+
+	public Sincronizador(Context contexto, DataBaseHelper dbHelper) {
 		this.contexto = contexto;
 
 		this.preferences = PreferenceManager.getDefaultSharedPreferences(this.contexto);
 
 		this.sessao = Sessao.getInstance();
+
+
+		this.dbHelper = dbHelper;
 	}
 
 	public boolean login() {
@@ -92,7 +99,7 @@ public class Sincronizador {
 		}
 	}
 
-	public String logins() throws Exception {
+	private String logins() throws Exception {
 		PHPConnection con = new PHPConnection("/service.php/mobile/usuarios", HTTP_METHOD.GET, this.hash);
 		con.connect();
 
@@ -108,7 +115,7 @@ public class Sincronizador {
 			for (int i = 0; i < array.length(); i++) {
 				JSONObject item = array.getJSONObject(i);
 
-				Usuario usuario = new Usuario();//this.gerenciador.obterUsuario(item.getString("id"));
+				Usuario usuario = this.dbHelper.obterUsuario(item.getString("id"));
 
 				usuario.setBloqueado(item.getInt("bloqueado") == 1 ? true : false);
 				usuario.setSenha(item.getString("senha"));
@@ -116,10 +123,10 @@ public class Sincronizador {
 
 				if (usuario.getIdonline() == null) {
 					usuario.setIdonline(item.getString("id"));
-					//this.gerenciador.salvar(usuario);
+					this.dbHelper.insereUsuario(usuario);
 
 				} else {
-					//this.gerenciador.atualizar(usuario);
+					this.dbHelper.atualizaUsuario(usuario);
 				}
 			}
 		} else if ("ERRO".equalsIgnoreCase(obj.getString("response"))) {
@@ -145,16 +152,16 @@ public class Sincronizador {
 			for (int i = 0; i < array.length(); i++) {
 				JSONObject item = array.getJSONObject(i);
 
-				Estudo estudo = new Estudo();//this.gerenciador.obterEstudo(item.getInt("nrestudo"));
+				Estudo estudo = this.dbHelper.obterEstudo(item.getInt("nrestudo"));
 
 				estudo.setDescricao(URLDecoder.decode(item.getString("descricao"), "UTF-8"));
 
 				if (estudo.getNrEstudo() == 0) {
 					estudo.setNrEstudo(item.getInt("nrestudo"));
-					//this.gerenciador.salvar(estudo);
+					this.dbHelper.insereEstudo(estudo);
 
 				} else {
-					//this.gerenciador.atualizar(estudo);
+					this.dbHelper.atualizaEstudo(estudo);
 				}
 			}
 		} else if ("ERRO".equalsIgnoreCase(obj.getString("response"))) {
@@ -164,11 +171,23 @@ public class Sincronizador {
 		return "";
 	}
 
-	private String designacoes() {
+	public String designacoes() {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
 		try {
-			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+			if (this.hash == null) {
+				this.obterChave();
+				this.gerarHash();
+			}
+
+			Calendar cd = Calendar.getInstance();
+			cd.add(Calendar.WEEK_OF_YEAR, -2);
+
+			this.dbHelper.removeDesignacoesPorData(cd.getTime());
 
 			PHPConnection con = new PHPConnection("/service.php/mobile/designacao", HTTP_METHOD.GET, this.hash);
+			con.setParameter("data_ultima", sdf.format(cd.getTime()));
 			con.connect();
 
 			if (con.getResponseCode() != 200) {
@@ -183,7 +202,7 @@ public class Sincronizador {
 				for (int i = 0; i < array.length(); i++) {
 					JSONObject item = array.getJSONObject(i);
 
-					Designacao designacao = new Designacao();//this.gerenciador.obterDesignacao(item.getString("id"));
+					Designacao designacao = this.dbHelper.obterDesignacao(item.getString("id"));
 
 					designacao.setData(sdf.parse(item.getString("data")));
 					designacao.setFonte(URLDecoder.decode(item.getString("fonte"), "UTF-8"));
@@ -191,7 +210,7 @@ public class Sincronizador {
 					designacao.setAjudante(item.getString("ajudante"));
 					designacao.setEstudante(item.getString("estudante"));
 					designacao.setNrEstudo(item.getInt("nrestudo"));
-					designacao.setStatus(Avaliacao.getByInitials(item.getString("status")));
+
 
 					switch (item.getInt("numero")) {
 						case 1:
@@ -210,10 +229,18 @@ public class Sincronizador {
 
 					if (designacao.getIdOnline() == null) {
 						designacao.setIdOnline(item.getString("id"));
-						//this.gerenciador.salvar(estudo);
+
+						this.dadosDesignacao(designacao, item, sdf2);
+						this.dbHelper.insereDesignacao(designacao);
 
 					} else {
-						//this.gerenciador.atualizar(estudo);
+						if (designacao.getDataAtualizacao().after(sdf2.parse(item.getString("dtultimaatualiza")))) {
+							this.atualizaDesignacao(designacao);
+
+						} else {
+							this.dadosDesignacao(designacao, item, sdf2);
+							this.dbHelper.atualizaDesignacao(designacao);
+						}
 					}
 				}
 			} else if ("ERRO".equalsIgnoreCase(obj.getString("response"))) {
@@ -245,9 +272,32 @@ public class Sincronizador {
             e.printStackTrace();
         }
 	}
+
+	private String atualizaDesignacao(Designacao designacao) {
+		try {
+			PHPConnection con = new PHPConnection("/service.php/mobile/designacao", HTTP_METHOD.GET, this.hash);
+			con.setParameter("id", designacao.getIdOnline());
+			con.setParameter("status", designacao.getStatus().getSigla());
+			con.setParameter("tempo", designacao.getTempo());
+			con.connect();
+
+			if (con.getResponseCode() != 200) {
+				throw new RuntimeException(con.getErrorDetails());
+			}
+
+			JSONObject obj = con.getResponse();
+
+			return "OK".equalsIgnoreCase(obj.getString("response")) ? "" : obj.getString("mensagem");
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return "";
+	}
 	
 	private void gerarHash() throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-		StringBuffer hash = new StringBuffer(this.preferences.getString("nrCong", "")).append(";");
+		StringBuilder hash = new StringBuilder(this.preferences.getString("nrCong", "")).append(";");
 
 		if (this.sessao.getUsuarioLogado() != null) {
 			hash.append(this.sessao.getUsuarioLogado().getNome()).append(";")
@@ -265,5 +315,11 @@ public class Sincronizador {
 		byte[] ciphered = cipher.doFinal(hash.toString().getBytes());
 		
 		this.hash = android.util.Base64.encodeToString(ciphered, android.util.Base64.NO_WRAP);
+	}
+
+	private void dadosDesignacao(Designacao designacao, JSONObject item, SimpleDateFormat sdf) throws JSONException, ParseException {
+		designacao.setStatus(Avaliacao.getByInitials(item.getString("status")));
+		designacao.setTempo(item.getString("tempo"));
+		designacao.setDataAtualizacao(sdf.parse(item.getString("dtultimaatualiza")));
 	}
 }

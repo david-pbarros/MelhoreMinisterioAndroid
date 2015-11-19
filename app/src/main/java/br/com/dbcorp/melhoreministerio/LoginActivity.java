@@ -1,7 +1,10 @@
 package br.com.dbcorp.melhoreministerio;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import br.com.dbcorp.melhoreministerio.DialogHelper.ButtonType;
+import br.com.dbcorp.melhoreministerio.db.DataBaseHelper;
 import br.com.dbcorp.melhoreministerio.dto.Usuario;
 import br.com.dbcorp.melhoreministerio.sinc.Sincronizador;
 
@@ -21,6 +25,7 @@ import br.com.dbcorp.melhoreministerio.sinc.Sincronizador;
 public class LoginActivity extends AppCompatActivity {
 
     private Sessao sessao;
+    private DataBaseHelper dbHelper;
 
     private EditText txNome;
     private EditText txSenha;
@@ -35,6 +40,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        this.dbHelper = new DataBaseHelper(this);
 
         this.sessao = Sessao.getInstance();
 
@@ -51,6 +58,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void finish() {
+        this.dbHelper.close();
+        super.finish();
+    }
 
     public void login(View view) {
         Usuario user = new Usuario();
@@ -74,31 +86,44 @@ public class LoginActivity extends AppCompatActivity {
             editor.commit();
         }
 
-        final Sincronizador sinc  = new Sincronizador(this);
+        new LoginSinc().execute(this.dbHelper);
 
-        Thread login = new Thread(new Runnable() {
+        /*final Sincronizador sinc  = new Sincronizador(this, this.dbHelper);
+
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                loginWebOK = sinc.login();
+                if (sinc.login()) {
+                    this.proximo(sinc);
+
+                } else {
+                    //TODO: login soh pela web, verificar login local antes do popup
+
+                    new DialogHelper(this)
+                            .setTitle("Login", R.mipmap.ic_launcher)
+                            .setMessage("Login Inválido!")
+                            .setbutton("OK", ButtonType.NEUTRAL, null)
+                            .show();
+                }
             };
-        });
 
-        while (login.isAlive()) {
-            //espera.......
-        }
+            private void proximo(Sincronizador sinc) {
+                this.sincroniza(sinc);
 
-        if (loginWebOK) {
-            this.proximo();
+                startActivity(new Intent(this, MainActivity.class));
 
-        } else {
-            //TODO: login soh pela web, verificar login local antes do popup
+                finish();
+            }
 
-            new DialogHelper(this)
-                    .setTitle("Login", R.mipmap.ic_launcher)
-                    .setMessage("Login Inválido!")
-                    .setbutton("OK", ButtonType.NEUTRAL, null)
-                    .show();
-        }
+            private void sincroniza(Sincronizador sinc) {
+                if (!this.dbHelper.existeRegistros()) {
+                    sinc.sincronismoGeral();
+
+                } else {
+                    sinc.designacoes();
+                }
+            }
+        }).start();*/
     }
 
     private String criptoSenha(String senha) throws NoSuchAlgorithmException {
@@ -108,17 +133,59 @@ public class LoginActivity extends AppCompatActivity {
         return android.util.Base64.encodeToString(result, Base64.NO_WRAP);
     }
 
-    private void proximo() {
-        this.sincGeral();
+    private class LoginSinc extends AsyncTask<DataBaseHelper, Void, Void> {
 
-        startActivity(new Intent(this, MainActivity.class));
+        private DataBaseHelper dbHelper;
+        private ProgressDialog dialog;
 
-        finish();
-    }
+        @Override
+        protected void onPreExecute() {
+            this.dialog = new ProgressDialog(LoginActivity.this);
+            this.dialog.show();
+        }
 
-    private void sincGeral() {
-        if (this.preferences.getBoolean("sinc_ini", false)) {
+        @Override
+        protected Void doInBackground(DataBaseHelper... params) {
+            this.dbHelper = (DataBaseHelper) params[0];
 
+            Sincronizador sinc = new Sincronizador(LoginActivity.this, this.dbHelper);
+
+            if (sinc.login()) {
+                this.proximo(sinc);
+
+            } else {
+
+                //TODO: login soh pela web, verificar login local antes do popup
+
+                this.dialog.dismiss();
+
+                new DialogHelper(LoginActivity.this)
+                        .setTitle("Login", R.mipmap.ic_launcher)
+                        .setMessage("Login Inválido!")
+                        .setbutton("OK", DialogHelper.ButtonType.NEUTRAL, null)
+                        .show();
+            }
+
+            return null;
+        }
+
+        private void proximo(Sincronizador sinc) {
+            this.sincroniza(sinc);
+
+            LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainActivity.class));
+
+            this.dialog.dismiss();
+
+            LoginActivity.this.finish();
+        }
+
+        private void sincroniza(Sincronizador sinc) {
+            if (!this.dbHelper.existeRegistros()) {
+                sinc.sincronismoGeral();
+
+            } else {
+                sinc.designacoes();
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class Designacao implements Serializable {
 
+    private int id;
     private TipoDesignacao tipoDesignacao;
     private String idOnline;
     private String tempo;
@@ -17,6 +18,7 @@ public class Designacao implements Serializable {
     private int nrEstudo;
     private Date data;
     private String sala;
+    private Date dataAtualizacao;
     private Map<Integer, String> estudos;//todo remover
 
     {
@@ -38,6 +40,13 @@ public class Designacao implements Serializable {
             default:
                 return android.R.drawable.presence_invisible;
         }
+    }
+
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
     }
 
     public TipoDesignacao getTipoDesignacao() {
@@ -109,6 +118,13 @@ public class Designacao implements Serializable {
     }
     public void setSala(String sala) {
         this.sala = sala;
+    }
+
+    public Date getDataAtualizacao() {
+        return dataAtualizacao;
+    }
+    public void setDataAtualizacao(Date dataAtualizacao) {
+        this.dataAtualizacao = dataAtualizacao;
     }
 
     @Override
