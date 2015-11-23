@@ -31,7 +31,7 @@ public class PHPConnection {
 	private Map<String, Object> parameters;
 	
 	public PHPConnection(String urlComp, HTTP_METHOD method, String hash) throws IOException {
-		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitAll().build());//premite acesso a net sincronamente na main thread.
+		//StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitAll().build());//premite acesso a net sincronamente na main thread.
 
 		this.createConn(new URL(url + urlComp), method);
 		

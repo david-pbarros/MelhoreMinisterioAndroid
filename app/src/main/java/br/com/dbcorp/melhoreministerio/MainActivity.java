@@ -1,96 +1,47 @@
 //https://www.google.com/design/icons/index.html#ic_notifications_off
 package br.com.dbcorp.melhoreministerio;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.PopupMenu.OnMenuItemClickListener;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnLongClickListener;
-import android.view.ViewConfiguration;
-import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import br.com.dbcorp.melhoreministerio.dto.Avaliacao;
+import br.com.dbcorp.melhoreministerio.db.DataBaseHelper;
 import br.com.dbcorp.melhoreministerio.dto.Designacao;
-import br.com.dbcorp.melhoreministerio.dto.TipoDesignacao;
 import br.com.dbcorp.melhoreministerio.preferencias.PreferenciasActivity;
+import br.com.dbcorp.melhoreministerio.sinc.Sincronizador;
 
+@SuppressLint("SimpleDateFormat")
 public class MainActivity extends AppCompatActivity implements OnLongClickListener, OnClickListener, OnItemClickListener, OnMenuItemClickListener {
 
-    //TODO: remover
-    private static List<Designacao> temp = new ArrayList<>();
-    static{
-        //TODO:substiruir linhas abaixo por vindas do banco
-        Designacao d = new Designacao();
-        d.setTipoDesignacao(TipoDesignacao.LEITURA);
-        d.setTempo("01:40");
-        d.setStatus(Avaliacao.PASSOU);
-        d.setEstudante("Fulano Da Silva");
-        d.setAjudante("Sicrano Junior");
-        d.setFonte("IgT p.99");
-        d.setData(new Date());
-        d.setNrEstudo(1);
-        temp.add(d);
-
-        d = new Designacao();
-        d.setTipoDesignacao(TipoDesignacao.VISITA);
-        d.setTempo("00:00");
-        d.setStatus(Avaliacao.NAO_AVALIADO);
-        d.setEstudante("Fulano Da Silva");
-        d.setAjudante("Sicrano Junior");
-        d.setFonte("IgT p.99");
-        d.setData(new Date());
-        d.setNrEstudo(2);
-        temp.add(d);
-
-        d = new Designacao();
-        d.setTipoDesignacao(TipoDesignacao.REVISITA);
-        d.setTempo("00:00");
-        d.setStatus(Avaliacao.NAO_PASSOU);
-        d.setEstudante("Fulano Da Silva");
-        d.setAjudante("Sicrano Junior");
-        d.setFonte("IgT p.99");
-        d.setData(new Date());
-        d.setNrEstudo(3);
-        temp.add(d);
-
-        d = new Designacao();
-        d.setTipoDesignacao(TipoDesignacao.ESTUDO);
-        d.setTempo("00:00");
-        d.setStatus(Avaliacao.SUBSTITUIDO);
-        d.setEstudante("Fulano Da Silva");
-        d.setAjudante("Sicrano Junior");
-        d.setFonte("IgT p.99");
-        d.setData(new Date());
-        d.setNrEstudo(4);
-        temp.add(d);
-    }
+    private DataBaseHelper dbHelper;
 
     private List<Date> datas;
     private List<Designacao> designacoes;
@@ -125,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
 
         this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        this.dbHelper = new DataBaseHelper(this);
+
         this.carregaDatas();
         this.setDesignacoes();
 
@@ -135,22 +88,19 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
         this.popup = new PopupMenu(this, btOption);
         this.popup.getMenuInflater().inflate(R.menu.menu_main, this.popup.getMenu());
         this.popup.setOnMenuItemClickListener(this);
+
+        new SincAutomatico().execute();
+    }
+
+    @Override
+    public void finish() {
+        this.dbHelper.close();
+        super.finish();
     }
 
     private void carregaDatas() {
         long oneDay = 86400000;
-        this.datas = new ArrayList<>();
-
-        //TODO:substiruir linhas abaixo por vindas do banco
-        try {
-            this.datas.add(sdf.parse("05/11/2015"));
-            this.datas.add(sdf.parse("12/11/2015"));
-            this.datas.add(sdf.parse("19/11/2015"));
-            this.datas.add(sdf.parse("26/11/2015"));
-
-        } catch (Exception e) {
-            //erro
-        }
+        this.datas = this.dbHelper.datasDesignacoes();
 
         long dtAtual = new Date().getTime() / oneDay;
 
@@ -196,10 +146,10 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
         v.setAnimation(this.clickAnimation);
 
         List<String> datas = new ArrayList<>();
-        datas.add("05/11/2015");
-        datas.add("12/11/2015");
-        datas.add("19/11/2015");
-        datas.add("26/11/2015");
+
+        for (Date date : this.datas) {
+            datas.add(sdf.format(date));
+        }
 
         new DialogHelper(this)
                 .setTitle("Login", R.mipmap.ic_launcher, R.color.text_default)
@@ -272,31 +222,24 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == 1) {
-            if (data.hasExtra("designacao")) {
-                //TODO: melhorar lógica
-
-                Designacao d1 = (Designacao) data.getExtras().getSerializable("designacao");
-                Designacao d = this.designacoes.get(this.designacoes.indexOf(d1));
-
-
-                d.setTempo(d1.getTempo());
-                d.setStatus(d1.getStatus());
-
-                this.setDesignacoes();
-            }
+            this.setDesignacoes();
         }
     }
 
     private void setDesignacoes() {
         this.setSala();
 
-        SimpleAdapter adapter = new SimpleAdapter(this, this.itensDesignacao(), R.layout.list_designacao, de, para);
+        try {
+            SimpleAdapter adapter = new SimpleAdapter(this, this.itensDesignacao(), R.layout.list_designacao, de, para);
+            this.listaDesignacoes.setAdapter(adapter);
 
-        this.listaDesignacoes.setAdapter(adapter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void setSala() {
-        String sala = null;
+        String sala;
 
         if (this.sala == null) {
             if (!this.preferences.contains("sala")) {
@@ -305,24 +248,21 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
             } else {
                 sala = this.preferences.getString("sala", "A");
             }
-
         } else {
             sala = this.sala;
         }
 
-        SharedPreferences.Editor editor = this.preferences.edit();
+        Editor editor = this.preferences.edit();
         editor.putString("sala", sala);
-        editor.commit();
+        editor.apply();
 
-        this.txSala.setText("Sala " + sala);
+        this.txSala.setText(getResources().getString(R.string.sala)+ sala);
 
         this.sala = sala;
     }
 
-    private List<Map<String, Object>> itensDesignacao() {
-        //buscar do banco
-        this.designacoes = new ArrayList<>();
-        this.designacoes.addAll(temp);
+    private List<Map<String, Object>> itensDesignacao() throws ParseException {
+        this.designacoes = this.dbHelper.designacoesPorData(sdf.parse(this.txData.getText().toString()), this.txSala.getText().toString());
 
         List<Map<String, Object>> designacoesMap = new ArrayList<>();
 
@@ -340,5 +280,34 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
     private void mudaSala() {
         this.sala = "A".equals(this.sala) ? "B" : "A";
         this.setDesignacoes();
+    }
+
+    private class SincAutomatico extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            Sincronizador sinc = new Sincronizador(MainActivity.this, MainActivity.this.dbHelper);
+
+            int minutes = MainActivity.this.preferences.getInt("sinc_interv", 0);
+
+            while (MainActivity.this.preferences.getBoolean("sinc_auto", false)) {
+                try {
+                    Thread.sleep(minutes * 60000);
+
+                    sinc.designacoes();
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            MainActivity.this.setDesignacoes();
+                        }
+                    });
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return null;
+        }
     }
 }

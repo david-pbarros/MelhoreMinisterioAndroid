@@ -9,6 +9,8 @@
     <string name="minutos">Minutos </string>
     <string name="segundos">Segundos</string>
 
+    <string name="sala">Sala\u0020</string>
+
     <string name="lbNome">Nome:</string>
     <string name="lbSenha">Senha:</string>
     <string name="lbCong">Congr.:</string>

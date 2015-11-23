@@ -159,11 +159,16 @@ public class LoginActivity extends AppCompatActivity {
 
                 this.dialog.dismiss();
 
-                new DialogHelper(LoginActivity.this)
-                        .setTitle("Login", R.mipmap.ic_launcher)
-                        .setMessage("Login Inválido!")
-                        .setbutton("OK", DialogHelper.ButtonType.NEUTRAL, null)
-                        .show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        new DialogHelper(LoginActivity.this)
+                                .setTitle("Login", R.mipmap.ic_launcher)
+                                .setMessage("Login Inválido!")
+                                .setbutton("OK", DialogHelper.ButtonType.NEUTRAL, null)
+                                .show();
+                    }
+                });
             }
 
             return null;

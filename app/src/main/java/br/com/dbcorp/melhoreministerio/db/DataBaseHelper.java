@@ -6,7 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import br.com.dbcorp.melhoreministerio.dto.Avaliacao;
 import br.com.dbcorp.melhoreministerio.dto.Designacao;
@@ -16,11 +18,8 @@ import br.com.dbcorp.melhoreministerio.dto.Usuario;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 
-	private static final String BANCO_DADOS = "EscolaMinisterio";
-	private static int VERSAO = 100;
-	
 	public DataBaseHelper(Context context) {
-		super(context, BANCO_DADOS, null, VERSAO);
+		super(context, "EscolaMinisterio", null, 100);
 	}
 	
 	@Override
@@ -58,13 +57,19 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public void insereUsuario(Usuario usuario) {
         ContentValues values = this.usuarioValues(usuario);
 
-        this.getWritableDatabase().insert("usuario", null, values);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.insert("usuario", null, values);
+        db.close();
     }
 
     public void atualizaUsuario(Usuario usuario) {
         ContentValues values = this.usuarioValues(usuario);
 
-        this.getWritableDatabase().update("usuario", values, "_id = ?", new String[]{Integer.toString(usuario.getId())});
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.update("usuario", values, "_id = ?", new String[]{Integer.toString(usuario.getId())});
+        db.close();
     }
 
     public boolean existeRegistros() {
@@ -72,7 +77,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = db.rawQuery("SELECT _id FROM designacao", null);
 
-        return cursor.getCount() > 0;
+        boolean existe = cursor.getCount() > 0;
+
+        cursor.close();
+
+        return existe;
     }
 
     public Usuario obterUsuario(String idOnline) {
@@ -87,6 +96,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             return this.preencheUsuario(cursor);
 
         } else {
+            cursor.close();
             return new Usuario();
         }
     }
@@ -94,13 +104,19 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public void insereEstudo(Estudo estudo) {
         ContentValues values = this.estudoValues(estudo);
 
-        this.getWritableDatabase().insert("estudo", null, values);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.insert("estudo", null, values);
+        db.close();
     }
 
     public void atualizaEstudo(Estudo estudo) {
         ContentValues values = this.estudoValues(estudo);
 
-        this.getWritableDatabase().update("estudo", values, "nrestudo = ?", new String[]{Integer.toString(estudo.getNrEstudo())});
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.update("estudo", values, "nrestudo = ?", new String[]{Integer.toString(estudo.getNrEstudo())});
+        db.close();
     }
 
     public Estudo obterEstudo(int nrEstudo) {
@@ -115,6 +131,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             return this.preencheEstudo(cursor);
 
         } else {
+            cursor.close();
             return new Estudo();
         }
     }
@@ -122,13 +139,19 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public void insereDesignacao(Designacao designacao) {
         ContentValues values = this.designacaoValues(designacao);
 
-        this.getWritableDatabase().insert("designacao", null, values);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.insert("designacao", null, values);
+        db.close();
     }
 
     public void atualizaDesignacao(Designacao designacao) {
         ContentValues values = this.designacaoValues(designacao);
 
-        this.getWritableDatabase().update("designacao", values, "_id = ?", new String[]{Integer.toString(designacao.getId())});
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.update("designacao", values, "_id = ?", new String[]{Integer.toString(designacao.getId())});
+        db.close();
     }
 
     public void removeDesignacoesPorData(Date data) {
@@ -137,6 +160,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         String[] values = {Long.toString(data.getTime())};
 
         db.rawQuery("DELETE FROM designacao WHERE data <= ?", values);
+
+        db.close();
     }
 
     public Designacao obterDesignacao(String idOnline) {
@@ -149,11 +174,52 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         if (cursor.getCount() > 0) {
             cursor.moveToFirst();
-            return this.preencheDesignacao(cursor);
+
+            Designacao des = this.preencheDesignacao(cursor);
+            cursor.close();
+            return des;
 
         } else {
+            cursor.close();
             return new Designacao();
         }
+    }
+
+    public List<Date> datasDesignacoes() {
+        List<Date> datas = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT DISTINCT(data) FROM designacao ORDER BY data", null);
+
+        while (cursor.moveToNext()) {
+            datas.add(new Date(cursor.getLong(0)));
+        }
+
+        cursor.close();
+
+        return datas;
+    }
+
+    public List<Designacao> designacoesPorData(Date data, String sala) {
+        List<Designacao> designacaos = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] values = {Long.toString(data.getTime()), sala.replace("Sala ", "")};
+
+        Cursor cursor = db.rawQuery("SELECT _id, idonline, data, fonte, tipo, sala, status, estudante, ajudante, tempo, dataatualizacao, d.nrestudo, e.descricao FROM designacao d " +
+                "LEFT JOIN estudo e ON e.nrestudo = d.nrestudo WHERE data = ? AND sala = ?", values);
+
+        while (cursor.moveToNext()) {
+            Designacao des = this.preencheDesignacao(cursor);
+            des.setNomeEstudo(cursor.getString(12));
+            designacaos.add(des);
+        }
+
+        cursor.close();
+
+        return designacaos;
     }
 
     private ContentValues designacaoValues(Designacao designacao) {
@@ -201,9 +267,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         designacao.setStatus(Avaliacao.getByInitials(cursor.getString(6)));
         designacao.setEstudante(cursor.getString(7));
         designacao.setAjudante(cursor.getString(8));
-        designacao.setTempo(cursor.getString(9));
         designacao.setDataAtualizacao(new Date(cursor.getLong(10)));
         designacao.setNrEstudo(cursor.getInt(11));
+
+        String tempo = cursor.getString(9);
+        designacao.setTempo(tempo == null || "".equals(tempo) ? "00:00" : tempo);
 
         return designacao;
     }
@@ -214,7 +282,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         usuario.setIdonline(cursor.getString(1));
         usuario.setNome(cursor.getString(2));
         usuario.setSenha(cursor.getString(3));
-        usuario.setBloqueado(cursor.getInt(4) == 1 ? true : false);
+        usuario.setBloqueado(cursor.getInt(4) == 1);
+
+        cursor.close();
 
         return usuario;
     }
@@ -223,6 +293,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         Estudo estudo = new Estudo();
         estudo.setNrEstudo(cursor.getInt(0));
         estudo.setDescricao(cursor.getString(1));
+
+        cursor.close();
 
         return estudo;
     }

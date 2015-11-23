@@ -19,15 +19,7 @@ public class Designacao implements Serializable {
     private Date data;
     private String sala;
     private Date dataAtualizacao;
-    private Map<Integer, String> estudos;//todo remover
-
-    {
-        this.estudos = new HashMap<>();
-        this.estudos.put(1, "Estudo a");
-        this.estudos.put(2, "Estudo b");
-        this.estudos.put(3, "Estudo c");
-        this.estudos.put(4, "Estudo d");
-    }
+    private String nmEstudo;
 
     public static int getIconCode(Avaliacao avaliacao) {
         switch (avaliacao) {
@@ -127,6 +119,10 @@ public class Designacao implements Serializable {
         this.dataAtualizacao = dataAtualizacao;
     }
 
+    public void setNomeEstudo(String nomeEstudo) {
+        this.nmEstudo = nomeEstudo;
+    }
+
     @Override
     public int hashCode() {
         return data.hashCode();
@@ -157,6 +153,6 @@ public class Designacao implements Serializable {
     }
 
     public String getEstudo() {
-        return nrEstudo + " - " + this.estudos.get(nrEstudo);
+        return nrEstudo + " - " + this.nmEstudo;
     }
 }

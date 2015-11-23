@@ -207,8 +207,8 @@ public class Sincronizador {
 					designacao.setData(sdf.parse(item.getString("data")));
 					designacao.setFonte(URLDecoder.decode(item.getString("fonte"), "UTF-8"));
 					designacao.setSala(item.getString("sala"));
-					designacao.setAjudante(item.getString("ajudante"));
-					designacao.setEstudante(item.getString("estudante"));
+					designacao.setAjudante(URLDecoder.decode(item.getString("ajudante"), "UTF-8"));
+					designacao.setEstudante(URLDecoder.decode(item.getString("estudante"), "UTF-8"));
 					designacao.setNrEstudo(item.getInt("nrestudo"));
 
 
