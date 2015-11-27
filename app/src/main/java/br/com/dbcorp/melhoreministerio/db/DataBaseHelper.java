@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +17,7 @@ import br.com.dbcorp.melhoreministerio.dto.Estudo;
 import br.com.dbcorp.melhoreministerio.dto.TipoDesignacao;
 import br.com.dbcorp.melhoreministerio.dto.Usuario;
 
-public class DataBaseHelper extends SQLiteOpenHelper {
+public class DataBaseHelper extends SQLiteOpenHelper implements Serializable {
 
 	public DataBaseHelper(Context context) {
 		super(context, "EscolaMinisterio", null, 100);

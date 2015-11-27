@@ -4,22 +4,18 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.webkit.MimeTypeMap;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
@@ -33,9 +29,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import br.com.dbcorp.melhoreministerio.db.DataBaseHelper;
 import br.com.dbcorp.melhoreministerio.dto.Avaliacao;
 import br.com.dbcorp.melhoreministerio.dto.Designacao;
-import br.com.dbcorp.melhoreministerio.dto.TipoDesignacao;
+import br.com.dbcorp.melhoreministerio.sinc.Sincronizador;
 
 public class DesignacaoActivity extends AppCompatActivity {
 
@@ -73,12 +70,20 @@ public class DesignacaoActivity extends AppCompatActivity {
     private boolean started;
     private boolean mudo;
 
+    private String tempoOrig;
+    private Avaliacao avalOrig;
+
+    private boolean sincronizado;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_designacao);
 
         this.designacao = (Designacao) this.getIntent().getExtras().getSerializable("designacao");
+
+        this.tempoOrig = this.designacao.getTempo();
+        this.avalOrig = this.designacao.getStatus();
 
         ((TextView)findViewById(R.id.lbTitle)).setText(new SimpleDateFormat("dd/MM/yyyy").format(this.designacao.getData()) + " - " + designacao.getTipoDesignacao());
 
@@ -129,8 +134,15 @@ public class DesignacaoActivity extends AppCompatActivity {
         this.designacao.setStatus(Avaliacao.values()[this.spAvaliacao.getSelectedItemPosition()]);
 
         Intent data = new Intent();
-        data.putExtra("designacao", this.designacao);
-        setResult(RESULT_OK, data);
+
+        if (this.avalOrig != this.designacao.getStatus() || !this.tempoOrig.equalsIgnoreCase(this.designacao.getTempo())) {
+            this.designacao.setDataAtualizacao(new Date());
+
+            data.putExtra("designacao", this.designacao);
+            setResult(RESULT_OK, data);
+        } else {
+            setResult(RESULT_CANCELED, data);
+        }
 
         super.finish();
     }

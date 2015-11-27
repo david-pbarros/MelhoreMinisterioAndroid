@@ -1,6 +1,5 @@
 package br.com.dbcorp.melhoreministerio;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,14 +26,13 @@ public class LoginActivity extends AppCompatActivity {
     private Sessao sessao;
     private DataBaseHelper dbHelper;
 
+    private ProgressDialog dialog;
     private EditText txNome;
     private EditText txSenha;
     private EditText txCongregacao;
     private TableRow lnCong;
 
     private SharedPreferences preferences;
-
-    private boolean loginWebOK;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +63,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login(View view) {
+        this.dialog = new ProgressDialog(LoginActivity.this);
+        this.dialog.show();
+
         Usuario user = new Usuario();
         user.setNome("admin");
 
@@ -83,47 +84,10 @@ public class LoginActivity extends AppCompatActivity {
         if (this.lnCong.getVisibility() != View.GONE) {
             SharedPreferences.Editor editor = this.preferences.edit();
             editor.putString("nrCong", this.txCongregacao.getText().toString());
-            editor.commit();
+            editor.apply();
         }
 
-        new LoginSinc().execute(this.dbHelper);
-
-        /*final Sincronizador sinc  = new Sincronizador(this, this.dbHelper);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (sinc.login()) {
-                    this.proximo(sinc);
-
-                } else {
-                    //TODO: login soh pela web, verificar login local antes do popup
-
-                    new DialogHelper(this)
-                            .setTitle("Login", R.mipmap.ic_launcher)
-                            .setMessage("Login Inválido!")
-                            .setbutton("OK", ButtonType.NEUTRAL, null)
-                            .show();
-                }
-            };
-
-            private void proximo(Sincronizador sinc) {
-                this.sincroniza(sinc);
-
-                startActivity(new Intent(this, MainActivity.class));
-
-                finish();
-            }
-
-            private void sincroniza(Sincronizador sinc) {
-                if (!this.dbHelper.existeRegistros()) {
-                    sinc.sincronismoGeral();
-
-                } else {
-                    sinc.designacoes();
-                }
-            }
-        }).start();*/
+        new LoginSinc().execute();
     }
 
     private String criptoSenha(String senha) throws NoSuchAlgorithmException {
@@ -133,22 +97,11 @@ public class LoginActivity extends AppCompatActivity {
         return android.util.Base64.encodeToString(result, Base64.NO_WRAP);
     }
 
-    private class LoginSinc extends AsyncTask<DataBaseHelper, Void, Void> {
-
-        private DataBaseHelper dbHelper;
-        private ProgressDialog dialog;
+    private class LoginSinc extends AsyncTask<Void, Void, Void> {
 
         @Override
-        protected void onPreExecute() {
-            this.dialog = new ProgressDialog(LoginActivity.this);
-            this.dialog.show();
-        }
-
-        @Override
-        protected Void doInBackground(DataBaseHelper... params) {
-            this.dbHelper = (DataBaseHelper) params[0];
-
-            Sincronizador sinc = new Sincronizador(LoginActivity.this, this.dbHelper);
+        protected Void doInBackground(Void... params) {
+            Sincronizador sinc = new Sincronizador(LoginActivity.this, LoginActivity.this.dbHelper);
 
             if (sinc.login()) {
                 this.proximo(sinc);
@@ -157,7 +110,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 //TODO: login soh pela web, verificar login local antes do popup
 
-                this.dialog.dismiss();
+                LoginActivity.this.dialog.dismiss();
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -179,13 +132,13 @@ public class LoginActivity extends AppCompatActivity {
 
             LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainActivity.class));
 
-            this.dialog.dismiss();
+            LoginActivity.this.dialog.dismiss();
 
             LoginActivity.this.finish();
         }
 
         private void sincroniza(Sincronizador sinc) {
-            if (!this.dbHelper.existeRegistros()) {
+            if (!LoginActivity.this.dbHelper.existeRegistros()) {
                 sinc.sincronismoGeral();
 
             } else {

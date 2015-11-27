@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
         this.popup.getMenuInflater().inflate(R.menu.menu_main, this.popup.getMenu());
         this.popup.setOnMenuItemClickListener(this);
 
-        new SincAutomatico().execute();
+        new SincAutomatico().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);//.execute();
     }
 
     @Override
@@ -112,6 +112,13 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
                 this.index = this.datas.indexOf(item);
                 break;
             }
+        }
+
+        if (this.txData.getText().length() == 0) {
+            int index = this.datas.size() - 1;
+
+            this.txData.setText(sdf.format(this.datas.get(index)));
+            this.index = index;
         }
     }
 
@@ -175,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
 
         Intent editar = new Intent(this, DesignacaoActivity.class);
         editar.putExtra("designacao", this.designacoes.get(position));
+
         startActivityForResult(editar, 1);
     }
 
@@ -222,6 +230,10 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == 1) {
+            Designacao designacao = (Designacao) data.getSerializableExtra("designacao");
+
+            new SincDesignacao().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, designacao);// .execute(designacao);
+
             this.setDesignacoes();
         }
     }
@@ -293,7 +305,12 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
                 try {
                     Thread.sleep(minutes * 60000);
 
-                    sinc.designacoes();
+                    if (Sincronizador.TIPO == 2) {
+                        sinc.sincronismoGeral();
+
+                    } else {
+                        sinc.designacoes();
+                    }
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -306,6 +323,18 @@ public class MainActivity extends AppCompatActivity implements OnLongClickListen
                     e.printStackTrace();
                 }
             }
+
+            return null;
+        }
+    }
+
+    private class SincDesignacao extends AsyncTask<Designacao, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Designacao... params) {
+            Sincronizador sinc = new Sincronizador(MainActivity.this, MainActivity.this.dbHelper);
+
+            sinc.atualizaDesignacao(params[0]);
 
             return null;
         }

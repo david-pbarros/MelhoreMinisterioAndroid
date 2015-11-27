@@ -42,6 +42,8 @@ public class Sincronizador {
 
 	private static final String chave = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0NCk1JR2ZNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0R05BRENCaVFLQmdRQzNwbVVNVVEvNDRvN3h2TDJIUmhWUC8ycVYNCkEvTkRCRGZGdENrbFJldU1iTGNRa1k1UlVqU05JaFBZdlFpN3V3dG52NUdWZ1RaK1BreU55UmdPdnUvTGlhKysNCm4yeFJLMDhma05xdkxNR2trZFg0VWo5Q0V5U2hsNEFGRXZCeVpDTjFiOU52cGVWVzJ5dmY5eUl1eXVtUjV2SjgNCmxMbXVPSXZQZmpHTkkvUkJQd0lEQVFBQg0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t";
 
+	public static int TIPO = 2;
+
 	private Sessao sessao;
 	private DataBaseHelper dbHelper;
 
@@ -62,6 +64,8 @@ public class Sincronizador {
 
 		this.dbHelper = dbHelper;
 	}
+
+
 
 	public boolean login() {
 		try {
@@ -87,6 +91,8 @@ public class Sincronizador {
 
 	public void sincronismoGeral() {
 		try {
+			Sincronizador.TIPO = 1;
+
 			this.obterChave();
 			this.gerarHash();
 
@@ -273,9 +279,14 @@ public class Sincronizador {
         }
 	}
 
-	private String atualizaDesignacao(Designacao designacao) {
+	public String atualizaDesignacao(Designacao designacao) {
 		try {
-			PHPConnection con = new PHPConnection("/service.php/mobile/designacao", HTTP_METHOD.GET, this.hash);
+			if (this.hash == null) {
+				this.obterChave();
+				this.gerarHash();
+			}
+
+			PHPConnection con = new PHPConnection("/service.php/mobile/designacao", HTTP_METHOD.POST, this.hash);
 			con.setParameter("id", designacao.getIdOnline());
 			con.setParameter("status", designacao.getStatus().getSigla());
 			con.setParameter("tempo", designacao.getTempo());
