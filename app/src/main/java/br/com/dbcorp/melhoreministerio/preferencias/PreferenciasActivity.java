@@ -15,19 +15,33 @@ import android.preference.RingtonePreference;
 import android.preference.SwitchPreference;
 import android.widget.BaseAdapter;
 
+import br.com.dbcorp.melhoreministerio.DialogHelper;
 import br.com.dbcorp.melhoreministerio.R;
+import br.com.dbcorp.melhoreministerio.db.DataBaseHelper;
 
 public class PreferenciasActivity extends PreferenceActivity {
+
+    private static DataBaseHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (db == null) {
+            db  = new DataBaseHelper(this);
+        }
 
         // Display the fragment as the main content.
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new ConfigFragment())
                 .commit();
 
+    }
+
+    @Override
+    public void finish() {
+        db.close();
+        super.finish();
     }
 
     public static class ConfigFragment extends PreferenceFragment implements OnPreferenceChangeListener {
@@ -68,6 +82,17 @@ public class PreferenciasActivity extends PreferenceActivity {
             } else if (preference.getKey().equals(this.chkSom.getKey())) {
                 this.setScreenSomSumary((Boolean) newValue);
                 ((BaseAdapter) getPreferenceScreen().getRootAdapter()).notifyDataSetChanged();
+
+            } else if (preference.getKey().equals(this.prefCong.getKey())) {
+                db.reset();
+
+                new DialogHelper(this.getActivity())
+                        .setTitle("Reinicio", R.mipmap.ic_launcher)
+                        .setMessage("Será necessário entrar na aplicação novamente!")
+                        .setbutton("OK", DialogHelper.ButtonType.NEUTRAL, null)
+                        .show();
+
+                this.getActivity().finishAffinity();
 
             } else {
                 preference.setSummary((String) newValue);

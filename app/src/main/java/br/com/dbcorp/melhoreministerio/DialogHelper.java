@@ -13,6 +13,8 @@ import java.util.List;
 
 public class DialogHelper {
 
+	private AlertDialog alert;
+
 	public enum ButtonType {
 		POSITIVE, NEUTRAL, NEGATIVE;
 	}
@@ -100,6 +102,7 @@ public class DialogHelper {
 	}
 	
 	public void show() {
-		this.builder.create().show();
+		this.alert = this.builder.create();
+		this.alert.show();
 	}
 }

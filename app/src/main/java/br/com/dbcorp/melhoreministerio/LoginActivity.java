@@ -70,7 +70,7 @@ public class LoginActivity extends AppCompatActivity {
         user.setNome("admin");
 
         try {
-            user.setSenha(this.criptoSenha("1"));
+            user.setSenha(this.criptoSenha("adminEscola"));
         } catch (Exception ex) {
             new DialogHelper(this)
                     .setTitle("Login", R.mipmap.ic_launcher)
@@ -107,21 +107,24 @@ public class LoginActivity extends AppCompatActivity {
                 this.proximo(sinc);
 
             } else {
+                if (LoginActivity.this.dbHelper.logon()) {
+                    LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    LoginActivity.this.finish();
 
-                //TODO: login soh pela web, verificar login local antes do popup
+                } else {
+                    LoginActivity.this.dialog.dismiss();
 
-                LoginActivity.this.dialog.dismiss();
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        new DialogHelper(LoginActivity.this)
-                                .setTitle("Login", R.mipmap.ic_launcher)
-                                .setMessage("Login Inválido!")
-                                .setbutton("OK", DialogHelper.ButtonType.NEUTRAL, null)
-                                .show();
-                    }
-                });
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            new DialogHelper(LoginActivity.this)
+                                    .setTitle("Login", R.mipmap.ic_launcher)
+                                    .setMessage("Login Inválido!")
+                                    .setbutton("OK", DialogHelper.ButtonType.NEUTRAL, null)
+                                    .show();
+                        }
+                    });
+                }
             }
 
             return null;

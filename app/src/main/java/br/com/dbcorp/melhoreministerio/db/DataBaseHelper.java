@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import br.com.dbcorp.melhoreministerio.Sessao;
 import br.com.dbcorp.melhoreministerio.dto.Avaliacao;
 import br.com.dbcorp.melhoreministerio.dto.Designacao;
 import br.com.dbcorp.melhoreministerio.dto.Estudo;
@@ -222,6 +223,27 @@ public class DataBaseHelper extends SQLiteOpenHelper implements Serializable {
 
         return designacaos;
     }
+
+    public boolean logon() {
+        Usuario usuario = Sessao.getInstance().getUsuarioLogado();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] values = {usuario.getNome(), usuario.getSenha()};
+
+        Cursor cursor = db.rawQuery("SELECT 1 FROM usuario WHERE nome = ? AND senha = ?", values);
+
+        return cursor.getCount() > 0;
+    }
+
+    public void reset() {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete("usuario", null, null);
+        db.delete("designacao", null, null);
+
+        db.close();
+    };
 
     private ContentValues designacaoValues(Designacao designacao) {
         ContentValues values = new ContentValues();
